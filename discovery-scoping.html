@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Discovery & Scoping — ERP-Involved Shopify Builds</title>
+<style>
+  :root{
+    --bg:#0c0f14; --panel:#141922; --panel2:#1b212c; --line:#27303d;
+    --txt:#e6edf3; --muted:#93a1b1; --dim:#6b7888;
+    --cyan:#36c5f0; --emerald:#34d399; --violet:#a78bfa; --amber:#fbbf24;
+    --rose:#fb7185; --chipOn:#2d6cdf;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.55; font-size:15px;}
+  a{color:var(--cyan); text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1000px; margin:0 auto; padding:24px 20px 80px}
+  .topnav{display:flex; gap:8px; margin:0 0 20px; flex-wrap:wrap}
+  .topnav a{font-size:13px; color:var(--muted); background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:7px 13px}
+  .topnav a:hover{color:var(--txt); text-decoration:none; border-color:#3a4658}
+  .topnav a.cur{background:var(--chipOn); border-color:var(--chipOn); color:#fff; font-weight:600}
+  header h1{font-size:25px; margin:0 0 8px; letter-spacing:-.3px}
+  header .sub{color:var(--muted); font-size:15px; margin:0; max-width:850px}
+  .disclaimer{font-size:12.5px; color:var(--dim); background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 14px; margin:16px 0 26px; line-height:1.45}
+  .disclaimer b{color:var(--muted)} .disclaimer a{color:var(--cyan)} .disclaimer .upd{color:var(--muted)}
+  h2.section{font-size:15px; text-transform:uppercase; letter-spacing:.8px; color:var(--dim); margin:34px 0 14px; border-bottom:1px solid var(--line); padding-bottom:8px}
+  p.intro{color:var(--muted); font-size:14px; margin:0 0 12px} p.intro b{color:var(--txt)}
+
+  .principles{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px}
+  .pcard{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .pcard h3{margin:0 0 6px; font-size:13px; text-transform:uppercase; letter-spacing:.5px; color:var(--cyan)}
+  .pcard p{margin:0; font-size:13.5px; color:var(--muted)} .pcard p b{color:var(--txt)}
+
+  ul.who{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:8px 18px 8px 36px; list-style:none}
+  ul.who li{padding:8px 0; border-top:1px solid var(--line); font-size:14px; color:var(--muted)}
+  ul.who li:first-child{border-top:none} ul.who b{color:var(--txt)}
+  ul.who li::before{content:"›"; color:var(--cyan); font-weight:700; margin-left:-16px; margin-right:9px}
+
+  .tplhead{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:0 0 8px}
+  .tplhead .copy{background:var(--chipOn); border:none; color:#fff; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer}
+  .tplhead .copy:active{transform:translateY(1px)}
+  textarea.tplbox{width:100%; background:#0a0d12; border:1px solid var(--line); color:#cdd9e5; border-radius:10px;
+    padding:13px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; line-height:1.5; white-space:pre; overflow:auto; resize:vertical; margin-bottom:8px}
+
+  .scopegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px}
+  .scard{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:13px 15px}
+  .scard h4{margin:0 0 5px; font-size:14px} .scard p{margin:0; font-size:13px; color:var(--muted)} .scard p b{color:var(--txt)}
+
+  ul.refs{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:8px 18px; list-style:none}
+  ul.refs li{padding:9px 0; font-size:13.5px; border-top:1px solid var(--line); color:var(--muted)}
+  ul.refs li:first-child{border-top:none} ul.refs b{color:var(--txt)}
+
+  footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line); color:var(--dim); font-size:12.5px}
+  footer b{color:var(--muted)} footer a{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="topnav">
+    <a href="index.html">ERP Launch Playbook</a>
+    <a href="discovery-scoping.html" class="cur">Discovery &amp; Scoping</a>
+    <a href="connector-reference.html">Integration Reference</a>
+  </nav>
+
+  <header>
+    <h1>Discovery &amp; Scoping — ERP-Involved Shopify Builds</h1>
+    <p class="sub">The working toolkit for discovering and scoping a Shopify project that involves an ERP — D2C or B2B. Includes copyable templates you can drop straight into your discovery doc or SOW. Pairs with the <a href="index.html">ERP Launch Playbook</a>.</p>
+  </header>
+
+  <p class="disclaimer"><b>Unofficial field reference</b> — not official Shopify documentation. Always verify against the <a href="https://help.shopify.com" target="_blank" rel="noopener">Shopify Help Center</a>, <a href="https://shopify.dev" target="_blank" rel="noopener">Shopify.dev</a>, and the ERP/connector vendor's docs. Spot something off? <a href="https://github.com/michelledrawert-shopify/Shopify-Back-Office-Integration-Guide/issues" target="_blank" rel="noopener">Open an issue</a>. &nbsp;·&nbsp; <span class="upd">Last updated: June 2026</span></p>
+
+  <h2 class="section">Why this discovery is different</h2>
+  <p class="intro">A standard Shopify discovery is mostly about the storefront — brand, merchandising, theme, marketing. An ERP-involved discovery also has to scope a <b>second system and the contract between the two</b>. Three things change:</p>
+  <div class="principles">
+    <div class="pcard"><h3>Different people in the room</h3><p>Not just ecom/marketing — you need <b>IT, the ERP admin/owner, finance/ops, the ERP's implementer or VAR</b>, and (for B2B) the wholesale lead. Discovering with only the ecom stakeholder is how these projects drift.</p></div>
+    <div class="pcard"><h3>A decision a normal discovery skips</h3><p>The <b>system-of-record map</b>: for every data domain, which system owns it after launch and which way it syncs. Leave it implicit and the build thrashes. (Template below.)</p></div>
+    <div class="pcard"><h3>Sequencing &amp; data readiness</h3><p>Is an <b>ERP migration also underway</b>, and how clean is the ERP's data? These are scope-defining questions that don't exist on a pure storefront project.</p></div>
+  </div>
+
+  <h2 class="section">Who to get in the room</h2>
+  <ul class="who">
+    <li><b>Merchant ecom / digital lead</b> — storefront, merchandising, go-live goals.</li>
+    <li><b>IT / ERP admin or owner</b> — the ERP's reality: version, hosting, APIs, existing integrations.</li>
+    <li><b>Finance / operations</b> — financials, tax, reconciliation expectations.</li>
+    <li><b>ERP implementer / VAR</b> — who actually builds/maintains the ERP side (often a separate firm).</li>
+    <li><b>Wholesale / sales lead</b> (B2B) — contract pricing, buyer structure, how reps order today.</li>
+    <li><b>The integration owner</b> — one accountable person on each side (partner + merchant).</li>
+  </ul>
+
+  <h2 class="section">Template 1 · System-of-Record Map</h2>
+  <p class="intro">The centerpiece of the discovery. For each domain, agree <b>which system owns it post-launch</b>, the <b>sync direction</b>, and whether it's <b>required to launch</b> (Phase 0) or can come later. Fill this live, with IT in the room.</p>
+  <div class="tplhead"><button class="copy" onclick="cp('sor',this)">Copy template</button></div>
+  <textarea id="sor" class="tplbox" rows="14" readonly spellcheck="false"># System-of-Record Map — [Merchant]
+
+| Data domain             | System of record | Sync direction        | Needed to launch? |
+|-------------------------|------------------|-----------------------|-------------------|
+| Products / catalog      | ERP / Shopify    | ERP → Shopify / 2-way | Y / N             |
+| Inventory               | ERP / Shopify    | ERP → Shopify         | Y / N             |
+| Pricing (incl. B2B)     | ERP / Shopify    | ERP → Shopify         | Y / N             |
+| Customers / companies   | ERP / Shopify    | 2-way                 | Y / N             |
+| Orders                  | Shopify / ERP    | Shopify → ERP         | Y / N             |
+| Fulfillment / shipping  | ERP / Shopify    | 2-way                 | Y / N             |
+| Financials / payments   | ERP / Shopify    | Shopify → ERP         | Y / N             |
+| Tax                     | ERP / engine     | —                     | Y / N             |
+| Returns / RMA           | ERP / Shopify    | —                     | Y / N             |
+
+Notes:
+- "Needed to launch? = Y" defines the minimum-viable integration (Phase 0).
+- Anything "N" is phased after go-live.</textarea>
+
+  <h2 class="section">Template 2 · Discovery question set (D2C &amp; B2B)</h2>
+  <p class="intro">Run these alongside the SoR map. The shared block applies to every ERP project; use the D2C or B2B block depending on the build.</p>
+  <div class="tplhead"><button class="copy" onclick="cp('disc',this)">Copy question set</button></div>
+  <textarea id="disc" class="tplbox" rows="34" readonly spellcheck="false"># ERP + Commerce Discovery — Question Set
+
+## Systems &amp; ownership
+- [ ] Which ERP, which version? Cloud or on-prem?
+- [ ] Is the ERP customized / heavily modified?
+- [ ] Does the ERP expose APIs? What integrations exist today?
+- [ ] Certified connector, middleware (iPaaS), app, or custom?
+- [ ] Who owns / builds the integration — partner side AND merchant side?
+- [ ] Who are the IT / ERP / finance stakeholders?
+
+## System of record  (fill the SoR map)
+- [ ] Products, inventory, pricing, customers, orders, fulfillment, financials, tax —
+      who owns each after launch, and which way does it sync?
+
+## Sequencing &amp; data
+- [ ] Is an ERP migration / upgrade also underway? Timeline &amp; dependencies?
+- [ ] What is the minimum-viable integration needed to launch?
+- [ ] How clean is the ERP data (catalog / customer / pricing)? Migration + cleanup scope?
+
+## D2C specifics
+- [ ] Order / inventory / fulfillment sync — real-time or batch?
+- [ ] Returns &amp; exchanges flow — where is it recorded?
+- [ ] Tax engine — Shopify Tax / Avalara / Vertex / other?
+
+## B2B specifics
+- [ ] Contract / customer-specific pricing — how many price points or catalogs?
+- [ ] Company / location / buyer hierarchy?
+- [ ] Payment terms, credit limits, draft / PO approval flows?
+- [ ] Where do reps place orders today — and where should they after launch?
+- [ ] Is the connector / middleware B2B-aware (companies, catalogs, price lists)?</textarea>
+
+  <h2 class="section">From discovery to scope</h2>
+  <div class="scopegrid">
+    <div class="scard"><h4>Split into workstreams</h4><p>Storefront build · integration · data migration · ERP-side changes. Each can have its own track and owner.</p></div>
+    <div class="scard"><h4>Turn the SoR map into a contract</h4><p>Convert the map into a concrete list: object × direction × frequency × phase.</p></div>
+    <div class="scard"><h4>Define minimum-viable integration</h4><p>The "Y to launch" rows = Phase 0. Everything else is a later phase. Protect the launch date.</p></div>
+    <div class="scard"><h4>Sequence concurrent work</h4><p>If an ERP migration is also happening, decouple timelines — usually launch Shopify on the current ERP first.</p></div>
+    <div class="scard"><h4>Signal the complexity</h4><p>Low / Med / High from the drivers: no certified connector, on-prem/legacy, real-time bidirectional, customization, B2B primitives.</p></div>
+    <div class="scard"><h4>Name owners &amp; log risks</h4><p>One integration owner per side; capture dependencies, assumptions, and the risks you'd flag to the merchant.</p></div>
+  </div>
+
+  <h2 class="section">Template 3 · Project scope skeleton</h2>
+  <p class="intro">A starting SOW structure for an ERP-involved build. Fill it from the SoR map and the discovery answers.</p>
+  <div class="tplhead"><button class="copy" onclick="cp('scope',this)">Copy scope skeleton</button></div>
+  <textarea id="scope" class="tplbox" rows="38" readonly spellcheck="false"># ERP-Involved Shopify Project — Scope Skeleton — [Merchant]
+
+## Workstreams
+- Storefront build:
+- Integration (ERP ↔ Shopify):
+- Data migration:
+- ERP-side changes:
+
+## Integration contract  (from the SoR map)
+| Object              | System of record | Direction     | Frequency  | Phase |
+|---------------------|------------------|---------------|------------|-------|
+| Orders              | Shopify          | Shopify → ERP | real-time  | 0     |
+| Inventory           | ERP              | ERP → Shopify |            |       |
+| Products / catalog  |                  |               |            |       |
+| Pricing             |                  |               |            |       |
+| Customers/companies |                  |               |            |       |
+| Fulfillment         |                  |               |            |       |
+| Financials / tax    |                  |               |            |       |
+
+## Minimum-viable integration  (Phase 0 — required to launch)
+-
+
+## Phase plan
+- Phase 0 (launch):
+- Phase 1:
+- Phase 2:
+
+## Sequencing
+- Concurrent ERP migration? (Y/N):
+- Sequence / interim integration:
+
+## Complexity:  Low / Medium / High
+- Drivers present:  [ ] no certified connector   [ ] on-prem / legacy ERP
+                    [ ] real-time bidirectional  [ ] heavy customization
+                    [ ] B2B primitives required
+
+## Ownership
+- Integration owner (partner):
+- Merchant IT / ERP owner:
+
+## Risks &amp; assumptions
+-</textarea>
+
+  <h2 class="section">Resources</h2>
+  <ul class="refs">
+    <li><b><a href="index.html">ERP Launch Playbook</a> —</b> the three plays for ERP-involved launches and what good looks like.</li>
+    <li><b><a href="connector-reference.html">Integration Reference</a> —</b> which back-office system maps to which Shopify integration path, with vendor contacts.</li>
+    <li><b>Shopify.dev —</b> <a href="https://shopify.dev/docs/apps/build/b2b" target="_blank" rel="noopener">B2B</a>, <a href="https://shopify.dev/docs/api/functions/latest/cart-transform" target="_blank" rel="noopener">Cart Transform Functions</a>, <a href="https://shopify.dev/docs/api/admin-graphql" target="_blank" rel="noopener">Admin API</a>.</li>
+  </ul>
+
+  <footer>
+    <p><b>How to use this:</b> run the discovery with the right people in the room, fill the system-of-record map and question set live, then translate them into the scope skeleton. The map is the single most valuable artifact — it turns "integrate the ERP" from a vague line item into a concrete, phaseable contract.</p>
+    <p>Spot something wrong or out of date? <a href="https://github.com/michelledrawert-shopify/Shopify-Back-Office-Integration-Guide/issues" target="_blank" rel="noopener">Open an issue on this repo</a> so we can keep it current. &nbsp;·&nbsp; Last updated: June 2026.</p>
+  </footer>
+</div>
+
+<script>
+function cp(id,btn){
+  var t=document.getElementById(id);
+  function ok(){ if(btn){ var o=btn.textContent; btn.textContent='Copied \u2713'; setTimeout(function(){ btn.textContent=o; },1500); } }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t.value).then(ok).catch(function(){ t.focus(); t.select(); try{document.execCommand('copy'); ok();}catch(e){} });
+  } else { t.focus(); t.select(); try{document.execCommand('copy'); ok();}catch(e){} }
+}
+</script>
+</body>
+</html>
