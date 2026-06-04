@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Back-Office Integration Reference</title>
+<style>
+  :root{
+    --bg:#0c0f14; --panel:#141922; --panel2:#1b212c; --line:#27303d;
+    --txt:#e6edf3; --muted:#93a1b1; --dim:#6b7888;
+    --cyan:#36c5f0; --emerald:#34d399; --violet:#a78bfa; --amber:#fbbf24;
+    --rose:#fb7185; --orange:#fb923c; --blue:#60a5fa;
+    --chip:#202836; --chipOn:#2d6cdf;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; font-size:15px;
+  }
+  a{color:var(--cyan); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1180px; margin:0 auto; padding:28px 20px 80px}
+  header h1{font-size:26px; margin:0 0 6px; letter-spacing:-.3px}
+  header .sub{color:var(--muted); font-size:15px; margin:0 0 4px; max-width:820px}
+  .banner{
+    background:linear-gradient(90deg,rgba(54,197,240,.10),rgba(96,165,250,.08));
+    border:1px solid #2a3b4d; border-radius:10px; padding:10px 14px; margin:16px 0 10px;
+    font-size:13px; color:#bfe3f5;
+  }
+  .banner b{color:#dff1fb}
+  .scope{font-size:13px; color:var(--dim); margin:0 0 22px}
+  .scope b{color:var(--muted)}
+  .disclaimer{font-size:12.5px;color:var(--dim);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:0 0 22px;line-height:1.45}
+  .disclaimer b{color:var(--muted)} .disclaimer a{color:var(--cyan)} .disclaimer .upd{color:var(--muted)}
+  .topnav{display:flex;gap:8px;margin:0 0 20px;flex-wrap:wrap}
+  .topnav a{font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 13px}
+  .topnav a:hover{color:var(--txt);text-decoration:none;border-color:#3a4658}
+  .topnav a.cur{background:var(--chipOn);border-color:var(--chipOn);color:#fff;font-weight:600}
+
+  .principles{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin:0 0 22px}
+  .pcard{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .pcard h3{margin:0 0 6px; font-size:13px; text-transform:uppercase; letter-spacing:.6px; color:var(--cyan)}
+  .pcard p{margin:0; font-size:13.5px; color:var(--muted)}
+  .pcard.tiers ol{margin:6px 0 0; padding-left:18px; font-size:13.5px; color:var(--muted)}
+  .pcard.tiers li{margin-bottom:3px}
+  .pcard.tiers b{color:var(--txt)}
+
+  h2.section{font-size:15px; text-transform:uppercase; letter-spacing:.8px; color:var(--dim); margin:30px 0 12px; border-bottom:1px solid var(--line); padding-bottom:8px}
+
+  .controls{position:sticky; top:0; background:var(--bg); padding:14px 0 12px; z-index:20; border-bottom:1px solid var(--line)}
+  .search{width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--txt);
+    border-radius:10px; padding:11px 14px; font-size:15px; outline:none}
+  .search:focus{border-color:var(--chipOn)}
+  .filtrow{display:flex; flex-wrap:wrap; gap:7px; margin-top:11px; align-items:center}
+  .flabel{font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:var(--dim); margin-right:2px}
+  .chip{background:var(--chip); border:1px solid var(--line); color:var(--muted); border-radius:999px;
+    padding:5px 12px; font-size:12.5px; cursor:pointer; user-select:none; transition:all .12s}
+  .chip:hover{border-color:#3a4658; color:var(--txt)}
+  .chip.on{background:var(--chipOn); border-color:var(--chipOn); color:#fff}
+  .count{color:var(--dim); font-size:12.5px; margin-left:auto}
+  .clear{background:none;border:none;color:var(--dim);font-size:12.5px;cursor:pointer;text-decoration:underline}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:13px; margin-top:18px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:15px 16px; display:flex; flex-direction:column}
+  .card.ent{opacity:.82}
+  .card .top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px}
+  .card h4{margin:0; font-size:16.5px; letter-spacing:-.2px}
+  .cat{font-size:11px; font-weight:600; padding:3px 8px; border-radius:6px; white-space:nowrap; letter-spacing:.3px}
+  .badges{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 8px}
+  .badge{font-size:11.5px; padding:3px 9px; border-radius:6px; background:var(--panel2); border:1px solid var(--line); color:var(--muted)}
+  .badge b{color:var(--txt); font-weight:600}
+  .seg{font-size:11px; padding:2px 7px; border-radius:5px; border:1px solid var(--line); color:var(--muted)}
+  .seg.SMB{color:#7ee787; border-color:#2c5a36}
+  .seg.MM{color:#79c0ff; border-color:#234a78}
+  .seg.ENT{color:#d2a8ff; border-color:#4a3470}
+  .note{font-size:13px; color:var(--muted); margin:6px 0 0}
+  .note b{color:var(--txt)}
+  .pathline{font-size:12.5px; color:var(--dim); margin-top:9px; border-top:1px dashed var(--line); padding-top:8px}
+  .pathline .pv{color:var(--amber); font-weight:600}
+  .support{color:var(--emerald)}
+  .empty{color:var(--dim); text-align:center; padding:40px; font-size:14px}
+
+  .gotchas{display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:12px}
+  .gcard{background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--rose); border-radius:10px; padding:13px 15px}
+  .gcard h4{margin:0 0 5px; font-size:14px}
+  .gcard p{margin:0; font-size:13px; color:var(--muted)}
+  footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line); color:var(--dim); font-size:12.5px}
+  footer b{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="topnav">
+    <a href="index.html">ERP Launch Playbook</a>
+    <a href="connector-reference.html" class="cur">Integration Reference</a>
+  </nav>
+  <header>
+    <h1>Back-Office Integration Reference</h1>
+    <p class="sub">For partners building on Shopify for small-to-mid merchants. Match a merchant's back-office system — ERP, inventory (IMS), or accounting — to the right Shopify integration path, know the limits before you scope, and find the vendor who actually supports it. Scope confidently on your own.</p>
+  </header>
+  <p class="scope"><b>Scope:</b> centered on SMB &amp; Mid-Market. Enterprise systems (SAP S/4 &amp; ECC, D365 F&amp;O, JD Edwards, Oracle EBS, Manhattan) are shown dimmed and tagged <b>ENT</b> — they're typically GSI-led and beyond a scaled build. Filter to <b>SMB</b>/<b>Mid-Market</b> to hide them.</p>
+
+  <p class="disclaimer"><b>Unofficial field reference</b> — not official Shopify documentation. Always verify against the <a href="https://help.shopify.com" target="_blank" rel="noopener">Shopify Help Center</a> and Partner docs before scoping. Vendor mentions are examples, not endorsements. Spot something off or out of date? <a href="https://github.com/michelledrawert-shopify/Shopify-Back-Office-Integration-Guide/issues" target="_blank" rel="noopener">Open an issue</a>. &nbsp;·&nbsp; <span class="upd">Last updated: June 2026</span></p>
+
+  <div class="principles">
+    <div class="pcard">
+      <h3>Mental model</h3>
+      <p>Shopify is the <b>storefront / sales-channel &amp; order layer</b> — usually <i>not</i> the system of record. The ERP/IMS stays the source of truth for pricing, inventory &amp; finance. Sync is <b>async</b> (webhooks + API). There is no live ERP call at checkout on standard plans — sync data into Shopify ahead of time.</p>
+    </div>
+    <div class="pcard tiers">
+      <h3>Pick your integration path</h3>
+      <ol>
+        <li><b>1P / certified connector</b> — least effort, vendor-supported</li>
+        <li><b>Certified middleware (iPaaS)</b> — Celigo, Jitterbit, Pipe17, VL Omni</li>
+        <li><b>App-store connector</b> — the SMB default (QuickBooks, Cin7, Katana…)</li>
+        <li><b>Custom build</b> — only when nothing above fits</li>
+      </ol>
+    </div>
+    <div class="pcard">
+      <h3>POS reality</h3>
+      <p>Nothing integrates <b>directly</b> to POS without a POS UI extension. POS orders flow through Shopify <b>admin</b>, and the back-office system integrates to admin. Purchase Orders: the <b>Purchase Order API isn't yet generally available</b> — only the Transfers API. Verify current status before scoping.</p>
+    </div>
+    <div class="pcard">
+      <h3>The two keys you'll need</h3>
+      <p>Use <b>order.id</b> as the cross-system match key (not the order name or confirmation number). For payments reconciliation, the gateway key is now <b>payment_id</b> — wire the ERP to that, not legacy gateway transaction IDs.</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input id="search" class="search" placeholder="Search a system (NetSuite, QuickBooks, Cin7, Business Central, Katana…)" />
+    <div class="filtrow">
+      <span class="flabel">Type</span>
+      <span class="chip cat-f" data-cat="ERP">ERP</span>
+      <span class="chip cat-f" data-cat="IMS">Inventory (IMS)</span>
+      <span class="chip cat-f" data-cat="Manufacturing">Manufacturing</span>
+      <span class="chip cat-f" data-cat="WMS/OMS">WMS / OMS</span>
+      <span class="chip cat-f" data-cat="Accounting">Accounting</span>
+      <span class="chip cat-f" data-cat="iPaaS">Middleware</span>
+    </div>
+    <div class="filtrow">
+      <span class="flabel">Segment</span>
+      <span class="chip seg-f" data-seg="SMB">SMB</span>
+      <span class="chip seg-f" data-seg="MM">Mid-Market</span>
+      <span class="chip seg-f" data-seg="ENT">Enterprise</span>
+      <span class="flabel" style="margin-left:14px">Path</span>
+      <span class="chip path-f" data-path="1P">1P / certified</span>
+      <span class="chip path-f" data-path="iPaaS">Middleware</span>
+      <span class="chip path-f" data-path="App">App-store</span>
+      <span class="chip path-f" data-path="Custom">Custom</span>
+      <button id="clear" class="clear">reset</button>
+      <span class="count" id="count"></span>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none">No systems match those filters.</div>
+
+  <h2 class="section">Set these expectations with the merchant before you scope</h2>
+  <div class="gotchas" id="gotchas"></div>
+
+  <footer>
+    <p><b>How to use this:</b> these deals often don't get formal pre-sales support from Shopify, so this guide is meant to give partners enough context to scope independently. Find the merchant's system, pick the path, read the limits, contact the listed vendor/app. Start at the App Store listing or the vendor's site; for custom work, the integration tier tells you roughly what you're signing up for.</p>
+    <p><b>Segment legend:</b> <b>SMB</b> = self-serve, app/connector-driven · <b>Mid-Market</b> = larger catalogs/volume, ERP migration often best deferred until after launch · <b>Enterprise</b> = GSI-led projects, usually out of scope here.</p>
+    <p>Spot something wrong or out of date? <a href="https://github.com/michelledrawert-shopify/Shopify-Back-Office-Integration-Guide/issues" target="_blank" rel="noopener">Open an issue on this repo</a> so we can keep it current.</p>
+  </footer>
+</div>
+
+<script>
+/* path codes: 1P=1P/Certified connector, iPaaS=Certified middleware, App=App-store connector, Custom=Custom build */
+const CATCOLOR={ERP:'#a78bfa', IMS:'#34d399', Manufacturing:'#fb923c', 'WMS/OMS':'#60a5fa', Accounting:'#fbbf24', iPaaS:'#36c5f0'};
+const PATHLABEL={'1P':'1P / certified connector','iPaaS':'Certified middleware (iPaaS)','App':'App-store connector','Custom':'Custom build'};
+
+const DATA=[
+/* ===== ERP ===== */
+{n:'NetSuite (Oracle)',c:'ERP',seg:['MM','ENT'],path:'1P',pos:'Yes (via connector)',b2b:'Yes',sup:'Oracle NetSuite Connector (App Store: “Oracle NetSuite”) · or middleware: Celigo, Patchworks, VL Omni, Pipe17, Jitterbit',
+ note:'The most common ERP you\'ll meet. The 1P connector fits SMB→mid; bigger/complex setups use middleware. <b>B2B is supported via the certified connector</b> — confirm current B2B feature coverage with NetSuite before scoping. If payments are captured in NetSuite, those payouts won\'t appear in Shopify finance reports — set that expectation with the merchant up front.'},
+{n:'Acumatica',c:'ERP',seg:['SMB','MM'],path:'1P',pos:'Yes',b2b:'Partial',sup:'Kensium-built certified connector + the merchant\'s Acumatica VAR',
+ note:'Solid certified connector. It receives the estimated shipping fee in the order payload (you map zones/methods in the connector). Confirm the merchant\'s VAR knows the connector before you commit timelines.'},
+{n:'MS Dynamics 365 Business Central',c:'ERP',seg:['SMB','MM'],path:'1P',pos:'Backend only',b2b:'Partial',sup:'Microsoft (free, ships inside BC) — set up via the merchant\'s Microsoft VAR',
+ note:'The SMB Microsoft ERP. <b>Admin/backend integration, not POS-focused.</b> B2B: price sync yes, SKUs stay in Shopify, <b>quotes/draft orders are NOT synced</b>. No native category mapping → watch for tax estimate-vs-recalc gaps. Extensible via the BC GitHub.'},
+{n:'MS Dynamics 365 Finance & Operations (F&O)',c:'ERP',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Custom/agency: VL Omni (eHouse), RSM US, Fisher Technology, Codeless Platforms',
+ note:'Enterprise MS ERP with an on-prem component. <b>Not the same as Business Central and NOT covered by its connector.</b> Custom only. Integrator quality varies widely on F&O builds — vet references and prior Shopify projects carefully.'},
+{n:'MS Dynamics GP (Great Plains)',c:'ERP',seg:['SMB','MM'],path:'Custom',pos:'—',b2b:'—',sup:'Custom via a Microsoft Dynamics reseller',
+ note:'Legacy. Custom integration through a Dynamics reseller.'},
+{n:'MS Retail Management System (RMS)',c:'ERP',seg:['SMB'],path:'App',pos:'—',b2b:'—',sup:'nChannel, Kosmos eSync, Webgility, SPS Commerce, eBridge',
+ note:'Legacy retail system. Connect via a third-party connector, or recommend migrating to Retail Management Hero (RMH).'},
+{n:'SAP Business One (B1)',c:'ERP',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'Vision33 (Saltbox connector), Codeless Platforms (EMEA), or custom (e.g. BlueSwitch)',
+ note:'The SMB/MM flavour of SAP. Vision33 specializes in SAP Business One; for other SAP products check coverage directly. Achievable, but plan for middleware or custom work.'},
+{n:'SAP S/4HANA & ECC',c:'ERP',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'GSI/SI (Accenture, Infosys, Deloitte, EPAM); VL Omni; TMG “Fuse”; MuleSoft',
+ note:'Enterprise SAP — no connector, GSI territory. Generally beyond a scaled-partner build.'},
+{n:'SAP By Design',c:'ERP',seg:['MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'Celigo, Fisher Technology, Codeless Platforms',
+ note:'Mid-market SAP cloud ERP; reachable via certified middleware.'},
+{n:'Sage Intacct',c:'ERP',seg:['MM'],path:'Custom',pos:'—',b2b:'—',sup:'Custom / middleware',
+ note:'Finance ERP. Good fit when the merchant needs invoicing / AR / charge-account workflows Shopify can\'t do natively.'},
+{n:'Sage 100 / 200 / 300',c:'ERP',seg:['SMB','MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'Jitterbit, Alumio, Zapier (no certified connector)',
+ note:'No certified connector. Common snag: the merchant\'s Sage reseller isn\'t familiar with whatever connector gets pitched — confirm up front.'},
+{n:'Sage 50 / Business Cloud Accounting',c:'Accounting',seg:['SMB'],path:'App',pos:'—',b2b:'—',sup:'Sage Business Cloud app (weak reviews), Zapier, Alumio',
+ note:'Lightweight Sage. App Store options are limited — test before recommending.'},
+{n:'Brightpearl (by Sage)',c:'ERP',seg:['SMB','MM'],path:'1P',pos:'Own POS',b2b:'Partial',sup:'Brightpearl (native integration)',
+ note:'Retail ERP + IMS. Bidirectional fulfillments supported; some limits (e.g. large warehouse-mapping setups). Brightpearl was acquired by Sage in 2022 — confirm roadmap and support cadence with the vendor when scoping longer-term builds.'},
+{n:'Infor (M3 / CloudSuite)',c:'ERP',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Custom/agency',
+ note:'Custom integration territory.'},
+{n:'Oracle EBS / Fusion',c:'ERP',seg:['ENT'],path:'iPaaS',pos:'—',b2b:'—',sup:'Oracle Integration Cloud Shopify adapter (Fusion) · or custom',
+ note:'Enterprise. No PrivateLink / IP allowlisting; EBS often on-prem. Beyond a scaled build.'},
+{n:'Oracle JD Edwards (JDE)',c:'ERP',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Custom/agency (e.g. Dyode, VL Omni)',
+ note:'Custom; each build differs by the JDE backend setup.'},
+{n:'Epicor',c:'ERP',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'Yes',sup:'Custom/agency (e.g. Teifi for live pricing)',
+ note:'Custom. Live ERP pricing has been done via Cart Transform Functions (B2B) — powerful but a build.'},
+{n:'IFS',c:'ERP',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'—',sup:'Boomi (common), Alumio',
+ note:'Reachable via middleware.'},
+{n:'Odoo',c:'ERP',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'Odoo-native connector (preferred), Jitterbit, Webkul',
+ note:'Use an <b>Odoo-native</b> connector so the support path stays Shopify ↔ Odoo and you\'re not stuck between three vendors.'},
+{n:'Zoho (Inventory / Books)',c:'ERP',seg:['SMB'],path:'iPaaS',pos:'—',b2b:'—',sup:'Mesa (ShopPad), Zapier',
+ note:'SMB suite; connect via automation/middleware.'},
+{n:'Fulfil.io',c:'ERP',seg:['MM'],path:'App',pos:'—',b2b:'—',sup:'Fulfil (Shopify-native ERP/OMS)',
+ note:'Modular multi-channel ERP/OMS with strong Shopify integration; popular with mid-market.'},
+
+/* ===== IMS / Inventory ===== */
+{n:'Cin7 (Core / DEAR)',c:'IMS',seg:['SMB','MM'],path:'App',pos:'Via admin',b2b:'Partial',sup:'Cin7 (App Store: “Cin7 Core” / “DEAR”)',
+ note:'The most-recommended SMB/MM inventory system. Strong across IMS + light WMS, units of measure, expiry/lots, light manufacturing. Go-to for apparel size/colour matrices, food/expiry, and sell-by-weight.'},
+{n:'Thrive (Shopventory)',c:'IMS',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'Thrive by Shopventory (App Store)',
+ note:'Multi-location inventory + reporting. Known gap: a single PO spanning multiple locations (PO consolidation) often needs their pro-services.'},
+{n:'Inventory Planner (by Sage)',c:'IMS',seg:['SMB','MM'],path:'App',pos:'No POS UI',b2b:'—',sup:'Inventory Planner by Sage (App Store)',
+ note:'Forecasting & replenishment. Browser-only — no POS UI extension.'},
+{n:'Fishbowl',c:'IMS',seg:['SMB','MM'],path:'App',pos:'Via admin',b2b:'Partial',sup:'Fishbowl (native integration)',
+ note:'More capable than Shopify\'s native inventory tooling — EDI, serial/lot tracking. <b>Caveat:</b> once an order imports it doesn\'t continuously re-sync (pay-later/late edits break), and there\'s no live PO scanning into Shopify POS.'},
+
+/* ===== Manufacturing ===== */
+{n:'Katana',c:'Manufacturing',seg:['SMB','MM'],path:'App',pos:'Via admin',b2b:'—',sup:'Katana MRP (App Store)',
+ note:'The go-to for <b>BOM / raw-materials → finished SKUs</b> (makers: food, cosmetics, furniture). Keeps the manufacturing complexity out of Shopify.'},
+{n:'Materials Inventory / GoodDay',c:'Manufacturing',seg:['SMB'],path:'App',pos:'—',b2b:'—',sup:'App Store (smaller, merchant-hungry vendors)',
+ note:'Lighter raw-materials apps for small makers when Katana/Cin7 are overkill or over-budget.'},
+
+/* ===== WMS / OMS ===== */
+{n:'Pipe17',c:'WMS/OMS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Yes',sup:'Pipe17 (App Store / pipe17.com)',
+ note:'OMS + order routing; bridges returns/RMA to ERP/WMS. B2B in scope. Useful when orders aren\'t closing out cleanly across systems.'},
+{n:'Deposco',c:'WMS/OMS',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Deposco (custom/middleware)',
+ note:'Robust WMS/OMS for allocation, routing, BOPIS at scale.'},
+{n:'Linnworks / SKUVault',c:'WMS/OMS',seg:['MM'],path:'App',pos:'—',b2b:'—',sup:'Linnworks (App Store / linnworks.com)',
+ note:'IMS/WMS with bin & zone management. Can get pricey (base + forecasting add-on).'},
+{n:'SkuLabs',c:'WMS/OMS',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'SkuLabs (App Store)',
+ note:'Mid-tier IMS/WMS; good step up when Shopify\'s native inventory tooling is too light.'},
+{n:'ShipHero',c:'WMS/OMS',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'ShipHero (App Store)',
+ note:'Warehouse/fulfillment-focused; common "next step up" from Shopify\'s native inventory tooling.'},
+{n:'Manhattan',c:'WMS/OMS',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'GSI / custom',
+ note:'Enterprise WMS/OMS — usually beyond a scaled build.'},
+{n:'NuOrder',c:'WMS/OMS',seg:['MM'],path:'Custom',pos:'—',b2b:'Yes',sup:'NuOrder (their in-house build, ~12–16 wks)',
+ note:'B2B wholesale ordering. Native integration is one-way (NuOrder → Shopify); annual-fee model, no quick connector — set timeline expectations.'},
+{n:'Legacy retail (Mi9 / Raymark / Retail Pro / Aptos)',c:'WMS/OMS',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Migrate — don\'t integrate',
+ note:'Generally not worth integrating — plan a migration. (Mi9 <i>Merchant</i> merchandising can integrate custom even where Mi9 POS is gone.)'},
+
+/* ===== Accounting ===== */
+{n:'QuickBooks Online (QBO)',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'App Store: QuickBooks Online connector, A2X, Bookkeep, MyWorks, Webgility',
+ note:'The default SMB accounting target. Pick by need: sales summaries (A2X / Bookkeep) vs full data sync (Webgility / MyWorks).'},
+{n:'QuickBooks Desktop (QBD)',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'App Store: Webgility (two-way), Parex, Connex, T-Hub',
+ note:'A recurring headache. <b>Webgility</b> is the most-recommended two-way option. Always confirm the exact QBD version (Enterprise 24.0, etc.) before committing.'},
+{n:'Xero',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'App Store: A2X, Bookkeep, Webgility',
+ note:'SMB accounting; summary-sync connectors are the norm.'},
+{n:'BookKeep',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'BookKeep (App Store)',
+ note:'Automates daily summaries and can <b>split payouts across bank accounts / escrow tax</b> — the usual answer to "multiple bank accounts in one shop." Often too pricey for the smallest merchants.'},
+
+/* ===== Middleware ===== */
+{n:'Celigo',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'Celigo (App Store / celigo.com)',
+ note:'Widely used for NetSuite ("NetSuite Integration by Celigo"). If capture happens in NetSuite, those payouts won\'t hit Shopify finance reports. B2B-primitive support varies — verify for the build.'},
+{n:'Jitterbit',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Yes',sup:'Jitterbit (jitterbit.com — incl. self-serve via Jitterbit University)',
+ note:'Documented B2B-primitive support (companies, catalogs, price lists). Has on-prem/SQL connectors (stored procedures). Supports self-serve through full implementation.'},
+{n:'VL Omni (eHouse)',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'VL Omni (part of eHouse Studio)',
+ note:'Strong for SAP, JDE, AS400, and D365 F&O connectors.'},
+{n:'Patchworks',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'Patchworks (patchworks.com)',
+ note:'Used for NetSuite and other ERP connections, especially in EMEA.'},
+{n:'Boomi (Dell)',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'—',sup:'Boomi (not a certified Shopify partner)',
+ note:'Capable, but not in Shopify\'s certified program. Frequently used for IFS and D365 F&O integrations.'},
+{n:'MuleSoft (Salesforce)',c:'iPaaS',seg:['ENT'],path:'iPaaS',pos:'—',b2b:'—',sup:'MuleSoft (Salesforce; not certified)',
+ note:'Enterprise middleware. Verify current B2B-primitive coverage before committing. Usually enterprise-scope.'},
+{n:'Alumio',c:'iPaaS',seg:['MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'Alumio (alumio.com)',
+ note:'Lower-cost middleware; seen for Sage and IFS.'},
+{n:'Mesa (ShopPad)',c:'iPaaS',seg:['SMB'],path:'iPaaS',pos:'—',b2b:'—',sup:'Mesa by ShopPad (App Store)',
+ note:'SMB automation/middleware; used for Odoo and Zoho.'},
+{n:'Matrixify',c:'iPaaS',seg:['SMB','MM','ENT'],path:'App',pos:'—',b2b:'—',sup:'Matrixify (App Store)',
+ note:'Gold standard for <b>flat files</b> — scheduled CSV import/export, SFTP, field mapping. Great for ERPs with no API and for initial data loads. <b>Not</b> real-time two-way sync.'},
+{n:'Syncio',c:'iPaaS',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'Syncio (App Store)',
+ note:'Multi-store inventory/product/order sync — the usual companion when a merchant runs multiple Shopify stores / expansion stores.'},
+{n:'Webgility',c:'iPaaS',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'Webgility (App Store)',
+ note:'Accounting-focused connector; two-way QBO/QBD/Xero sync. The most-recommended QuickBooks bridge.'},
+{n:'SPS Commerce / eBridge / nChannel',c:'iPaaS',seg:['SMB','MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'EDI vendors (SPS Commerce, eBridge, nChannel)',
+ note:'EDI and legacy-system integration (e.g. MS RMS, retail/wholesale EDI flows).'}
+];
+
+const GOTCHAS=[
+ {t:'Reconcile payments on Shopify\'s payment_id', d:'With Shopify Payments, point the ERP/accounting integration at Shopify\'s <b>payment_id</b> for payments reconciliation (read it from OrderTransaction.paymentId). Don\'t build reconciliation around a gateway-specific transaction ID.'},
+ {t:'Three order IDs — use order.id', d:'order.name (admin) ≠ confirmation number (buyer) ≠ order.id (API). Use <b>order.id</b> as the cross-system match key. The order name isn\'t on the Thank-You page or in Web Pixels, so don\'t build reconciliation around it.'},
+ {t:'Build webhooks to be resilient', d:'Connectors that don\'t dedupe / re-query on webhook receipt can cause <b>duplicate or missing orders</b> during peak sales — a common failure mode during BFCM. Add idempotency keys, re-query on receipt, and load-test before high-volume events.'},
+ {t:'500 line-item cap', d:'Cart / checkout / order / draft are capped at <b>500 lines</b>. Breaks large B2B/distributor orders. No near-term lift — split orders or qualify the merchant out.'},
+ {t:'B2B catalog scaling', d:'B2B catalogs are reliable into the low tens of thousands; very large counts (one catalog per company from the ERP) hit limits. Consider live ERP pricing via Cart Transform Functions instead of huge catalog counts.'},
+ {t:'POS isn\'t a direct ERP target', d:'No direct ERP↔POS link without a POS UI extension. The <b>Purchase Order API isn\'t generally available yet</b> (only Transfers API), so receiving purchase orders from the ERP inside Shopify POS isn\'t native. Verify current PO API status before scoping.'},
+ {t:'POS UI Extensions are the partner build path for POS↔ERP', d:'When the merchant needs ERP-aware workflows inside POS (live inventory lookup, custom receipt logic, ERP-driven returns), <b>POS UI Extensions</b> are the partner-buildable surface. Off-the-shelf connectors won\'t cover this. Scope it as a custom build alongside the back-office connector, and confirm the extension targets you need are supported.'},
+ {t:'Use Plus Staging Stores for integration testing', d:'For Plus merchants, <b>Plus Staging Stores</b> give you a separate environment with a one-time data copy at creation — use these to test ERP/IMS integrations before going live. Staging stores must be created from the merchant\'s Plus org. Ongoing data sync between staging and production isn\'t native; third-party tools (e.g. Rewind Copy) cover that.'},
+ {t:'Orders must close out in Shopify', d:'If the ERP settles payment, the order still needs to be marked paid / closed out in Shopify — leaving orders as unpaid drafts breaks the buyer\'s order history and falls outside Shopify\'s terms.'},
+ {t:'No live ERP calls at checkout', d:'Real-time pricing/inventory/tax/validation calls to the ERP during checkout require Network Access for Functions — a gated, approval-based entitlement oriented to Enterprise (lower-GMV merchants are typically declined). Confirm eligibility before promising it; otherwise pre-sync ERP data into Shopify metafields/metaobjects ahead of time.'},
+ {t:'One shop = one payout account', d:'A single Shopify shop pays out to one bank account by default. Shopify Payments multi-entity can split payouts per legal entity — confirm current plan/eligibility for the merchant\'s case before relying on it. Cross-country splits still typically use expansion stores; tax escrow / accounting splits can also happen downstream (BookKeep / accounting / ERP).'},
+ {t:'A connector isn\'t automatically B2B-aware', d:'Many connectors don\'t support B2B primitives (companies, catalogs, price lists). Confirm B2B coverage for the specific connector before you promise B2B — don\'t assume.'}
+];
+
+const grid=document.getElementById('grid');
+const empty=document.getElementById('empty');
+const countEl=document.getElementById('count');
+const search=document.getElementById('search');
+const state={cats:new Set(),segs:new Set(),paths:new Set(),q:''};
+
+function segBadges(seg){return seg.map(s=>`<span class="seg ${s}">${s}</span>`).join('')}
+function render(){
+  const q=state.q.toLowerCase();
+  const rows=DATA.filter(d=>{
+    if(state.cats.size && !state.cats.has(d.c)) return false;
+    if(state.segs.size && !d.seg.some(s=>state.segs.has(s))) return false;
+    if(state.paths.size && !state.paths.has(d.path)) return false;
+    if(q && !(d.n.toLowerCase().includes(q) || d.note.toLowerCase().includes(q) || (d.sup||'').toLowerCase().includes(q) || d.c.toLowerCase().includes(q))) return false;
+    return true;
+  });
+  countEl.textContent=`${rows.length} of ${DATA.length} systems`;
+  empty.style.display=rows.length?'none':'block';
+  grid.innerHTML=rows.map(d=>{
+    const entOnly = d.seg.length===1 && d.seg[0]==='ENT';
+    return `
+    <div class="card${entOnly?' ent':''}">
+      <div class="top">
+        <h4>${d.n}</h4>
+        <span class="cat" style="background:${CATCOLOR[d.c]}22;color:${CATCOLOR[d.c]}">${d.c}</span>
+      </div>
+      <div class="badges">
+        ${segBadges(d.seg)}
+        <span class="badge">POS <b>${d.pos}</b></span>
+        <span class="badge">B2B <b>${d.b2b}</b></span>
+      </div>
+      <p class="note">${d.note}</p>
+      <div class="pathline"><span class="pv">${PATHLABEL[d.path]}</span> &nbsp;·&nbsp; <span class="support">${d.sup}</span></div>
+    </div>`;}).join('');
+}
+function syncHash(){
+  const p=new URLSearchParams();
+  if(state.cats.size)p.set('type',[...state.cats].join(','));
+  if(state.segs.size)p.set('seg',[...state.segs].join(','));
+  if(state.paths.size)p.set('path',[...state.paths].join(','));
+  if(state.q)p.set('q',state.q);
+  const s=p.toString();
+  history.replaceState(null,'', s ? ('#'+s) : (location.pathname+location.search));
+}
+function update(){ render(); syncHash(); }
+function bindChips(cls,set,attr){
+  document.querySelectorAll(cls).forEach(c=>c.addEventListener('click',()=>{
+    const v=c.dataset[attr]; c.classList.toggle('on');
+    if(set.has(v)) set.delete(v); else set.add(v); update();
+  }));
+}
+bindChips('.cat-f',state.cats,'cat');
+bindChips('.seg-f',state.segs,'seg');
+bindChips('.path-f',state.paths,'path');
+document.querySelectorAll('.chip').forEach(c=>{
+  c.setAttribute('role','button'); c.tabIndex=0;
+  c.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); c.click(); } });
+});
+(function initFromHash(){
+  const h=decodeURIComponent(location.hash.replace(/^#/,''));
+  if(!h) return;
+  const p=new URLSearchParams(h);
+  const apply=(key,set,attr)=>{(p.get(key)||'').split(',').filter(Boolean).forEach(v=>{set.add(v);document.querySelectorAll('.'+attr+'-f').forEach(c=>{if(c.dataset[attr]===v)c.classList.add('on');});});};
+  apply('type',state.cats,'cat'); apply('seg',state.segs,'seg'); apply('path',state.paths,'path');
+  const q=p.get('q'); if(q){ state.q=q; search.value=q; }
+})();
+search.addEventListener('input',e=>{state.q=e.target.value;update()});
+document.getElementById('clear').addEventListener('click',()=>{
+  state.cats.clear();state.segs.clear();state.paths.clear();state.q='';search.value='';
+  document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'));update();
+});
+document.getElementById('gotchas').innerHTML=GOTCHAS.map(g=>`<div class="gcard"><h4>${g.t}</h4><p>${g.d}</p></div>`).join('');
+render();
+</script>
+</body>
+</html>
