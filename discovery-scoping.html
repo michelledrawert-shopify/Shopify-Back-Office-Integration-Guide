@@ -122,6 +122,8 @@ Notes:
 - [ ] Certified connector, middleware (iPaaS), app, or custom?
 - [ ] Who owns / builds the integration — partner side AND merchant side?
 - [ ] Who are the IT / ERP / finance stakeholders?
+- [ ] Who outside our team is on the critical path (ERP VAR, IT, connector / tax
+      vendor) — and what lead time does each need? (Put these in the plan with owners.)
 
 ## System of record  (fill the SoR map)
 - [ ] Products, inventory, pricing, customers, orders, fulfillment, financials, tax —
@@ -134,6 +136,8 @@ Notes:
 
 ## D2C specifics
 - [ ] Order / inventory / fulfillment sync — real-time or batch?
+      (Recommendation: stream data in where possible rather than batching — even
+       hourly batches let Shopify and the ERP drift out of sync.)
 - [ ] Returns &amp; exchanges flow — where is it recorded?
 - [ ] Tax engine — Shopify Tax / Avalara / Vertex / other?
 
@@ -152,6 +156,7 @@ Notes:
     <div class="scard"><h4>Sequence concurrent work</h4><p>If an ERP migration is also happening, decouple timelines — usually launch Shopify on the current ERP first.</p></div>
     <div class="scard"><h4>Signal the complexity</h4><p>Low / Med / High from the drivers: no certified connector, on-prem/legacy, real-time bidirectional, customization, B2B primitives.</p></div>
     <div class="scard"><h4>Name owners &amp; log risks</h4><p>One integration owner per side; capture dependencies, assumptions, and the risks you'd flag to the merchant.</p></div>
+    <div class="scard"><h4>Put external dependencies in the plan</h4><p>List every party outside your team on the critical path — <b>ERP VAR, merchant IT, connector/tax vendor</b> — each with an <b>owner and a lead time</b>, and review them in <b>every status update</b>. Their work won't move just because yours is ready; "waiting on the VAR" is the usual reason these timelines slip.</p></div>
   </div>
 
   <h2 class="section">Template 3 · Project scope skeleton</h2>
@@ -188,6 +193,14 @@ Notes:
 - Concurrent ERP migration? (Y/N):
 - Sequence / interim integration:
 
+## External dependencies  (review every status update — not logged once)
+| Dependency / who owns it            | Needed by | Lead time | Status |
+|-------------------------------------|-----------|-----------|--------|
+| ERP connector build (VAR / vendor)  |           |           |        |
+| Merchant IT (API access, creds, env)|           |           |        |
+| Tax engine setup                    |           |           |        |
+| ERP-side data cleanup / readiness   |           |           |        |
+
 ## Complexity:  Low / Medium / High
 - Drivers present:  [ ] no certified connector   [ ] on-prem / legacy ERP
                     [ ] real-time bidirectional  [ ] heavy customization
@@ -208,7 +221,7 @@ Notes:
   </ul>
 
   <footer>
-    <p><b>How to use this:</b> run the discovery with the right people in the room, fill the system-of-record map and question set live, then translate them into the scope skeleton. The map is the single most valuable artifact — it turns "integrate the ERP" from a vague line item into a concrete, phaseable contract.</p>
+    <p><b>How to use this:</b> run the discovery with the right people in the room, fill the system-of-record map and question set live, then translate them into the scope skeleton. The map is the single most valuable artifact — it turns "integrate the ERP" from a vague line item into a concrete, phaseable contract. Pair it with a named list of external dependencies and lead times, reviewed every status update — that's the part that protects the date.</p>
     <p>Spot something wrong or out of date? <a href="https://github.com/michelledrawert-shopify/Shopify-Back-Office-Integration-Guide/issues" target="_blank" rel="noopener">Open an issue on this repo</a> so we can keep it current. &nbsp;·&nbsp; Last updated: June 2026.</p>
   </footer>
 </div>
