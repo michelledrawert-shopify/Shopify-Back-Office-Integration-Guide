@@ -66,6 +66,11 @@
 
   footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line); color:var(--dim); font-size:12.5px}
   footer b{color:var(--muted)} footer a{color:var(--cyan)}
+
+  .callout{background:linear-gradient(180deg,#1b232f,#161d28); border:1px solid var(--line); border-left:3px solid var(--amber); border-radius:14px; padding:18px 22px; margin:4px 0 14px}
+  .callout h3{margin:0 0 8px; font-size:16px; color:var(--amber); letter-spacing:-.2px}
+  .callout p{margin:0 0 8px; font-size:14px; color:var(--muted)} .callout p:last-child{margin-bottom:0}
+  .callout p b{color:var(--txt)}
 </style>
 </head>
 <body>
@@ -89,6 +94,7 @@
     <div class="pcard"><h3>Integration is its own workstream</h3><p>Scope it, staff it, and give it <b>its own timeline</b> — planned in discovery, separate from the storefront build. It rarely fits as a single line item.</p></div>
     <div class="pcard"><h3>Launch on minimum-viable integration</h3><p>Define the <b>smallest sync needed to go live</b> (often just orders → ERP) and phase the rest after launch. The storefront doesn't wait for full ERP parity.</p></div>
     <div class="pcard"><h3>One integration owner</h3><p>Name a <b>single accountable owner</b> for the ERP integration. When several partners share a project with no clear owner, it drifts.</p></div>
+    <div class="pcard"><h3>Dependencies are the critical path</h3><p>The work that slips a launch usually sits in <b>someone else's backlog</b> — the ERP's VAR, the merchant's IT, the connector or tax-engine vendor. <b>Name each one, put it in the plan with an owner and a lead time, and re-raise it every status update.</b></p></div>
   </div>
 
   <h2 class="section">Pick your play</h2>
@@ -126,14 +132,20 @@
     <h5>What good looks like — decide where each piece lives</h5>
     <ul class="where">
       <li><span class="k">Catalog &amp; products:</span> synced from the ERP, or maintained in Shopify.</li>
-      <li><span class="k">Pricing:</span> per-company contract pricing from the ERP → native B2B catalogs, or <b>live pricing via Cart Transform</b> when pricing is too dynamic or too large for catalogs.</li>
+      <li><span class="k">Pricing:</span> per-company contract pricing from the ERP → native B2B catalogs. Pricing that outgrows catalogs — very large or highly dynamic contract pricing — is a <b>deeper architecture conversation</b>: real-time ERP pricing at checkout can over-burden checkout and is gated to <b>Enterprise</b>. Don't default to it.</li>
       <li><span class="k">Companies, locations &amp; buyers:</span> native B2B primitives — <b>confirm your connector/middleware is B2B-aware</b> (the most common wrong assumption).</li>
-      <li><span class="k">Order flow:</span> orders placed in Shopify flow to the ERP; define payment terms and draft/PO approval.</li>
+      <li><span class="k">Order flow:</span> orders placed in Shopify flow to the ERP, and <b>fulfillments flow back to Shopify</b>; define payment terms and draft/PO approval. On <b>manual payment methods</b> (e.g. B2B terms), make sure orders get <b>marked as paid in Shopify</b> once the ERP settles them — otherwise they sit as open/unpaid and break the buyer's order history.</li>
       <li><span class="k">Payment:</span> terms vs. card; make sure orders close out in Shopify.</li>
     </ul>
     <div class="key">The goal is to make Shopify the <b>trusted transacting layer</b> — wholesale orders flowing through Shopify to the ERP, not Shopify configured while orders still get placed in the ERP.</div>
     <h5>Phase it to build momentum</h5>
     <ul><li>Prove the ERP ↔ Shopify B2B loop on <b>one segment, region, or catalog first</b>, then expand. A full big-bang B2B scope is what feels "too big to start" — phasing is how you actually get live.</li></ul>
+  </div>
+
+  <div class="callout">
+    <h3>The thing that quietly blows the timeline</h3>
+    <p>Across all three plays, the integration's critical path runs through people you <b>don't manage</b> — the ERP's implementer/VAR, the merchant's IT, the connector or tax-engine vendor. Their piece won't move just because your build is ready, and "we're waiting on the VAR" is the single most common reason even seasoned agencies miss the date.</p>
+    <p>Treat it as work, not a footnote. From day one: <b>(1)</b> list every external dependency by name, <b>(2)</b> put each in the project plan with an <b>owner and a realistic lead time</b>, and <b>(3)</b> re-surface them in <b>every status update</b> — not just once they're already blocking. Dependencies you manage out loud, on a standing agenda, are what separate the launches that hold their date from the ones that slip for months.</p>
   </div>
 
   <h2 class="section">Scope it in discovery — the questions that set you up to win</h2>
@@ -142,10 +154,11 @@
     <li><b>ERP details:</b> which ERP, which version, cloud or on-prem, and is it customized?</li>
     <li><b>Integration path:</b> is there a certified connector, a middleware option, an app, or is this custom? (Start in the <a href="connector-reference.html">Integration Reference</a>.)</li>
     <li><b>Objects &amp; direction:</b> which objects sync (orders, products, inventory, customers, fulfillment, financials) and which way — and which are needed <i>to launch</i> vs. later?</li>
-    <li><b>Timing:</b> real-time or batch? What's the minimum-viable integration to go live?</li>
+    <li><b>Timing:</b> real-time or batch, and what's the minimum-viable integration to go live? <b>Recommendation: stream data in where possible rather than batching</b> — even hourly batches let Shopify and the ERP drift out of sync.</li>
     <li><b>Concurrent projects:</b> is an ERP migration also underway? If so, what's the sequence and what's the interim integration?</li>
     <li><b>B2B specifics:</b> contract pricing model, company/buyer structure, payment terms, approval flows — and is the connector B2B-aware?</li>
     <li><b>Ownership:</b> who is the single accountable owner of the integration, on the partner side and the merchant side?</li>
+    <li><b>External dependencies &amp; lead times:</b> who outside your team sits on the critical path — ERP VAR, merchant IT, connector/tax-engine vendor — and what lead time does each need? These belong in the plan as named items with owners, re-checked every status update, not logged once.</li>
   </ul>
 
   <p style="font-size:13.5px;color:var(--muted);margin:12px 0 0">Full version — a copyable discovery question set, a system-of-record map, and a scope skeleton — in the <a href="discovery-scoping.html">Discovery &amp; Scoping toolkit</a>.</p>
@@ -153,9 +166,10 @@
   <h2 class="section">Design within these from day one</h2>
   <div class="realities">
     <div class="rcard"><p><b>Reconcile on Shopify's IDs.</b> Match records on <b>order.id</b> and reconcile payments on <b>payment_id</b> (with Shopify Payments) — not on the order name or a gateway-specific ID.</p></div>
-    <div class="rcard"><p><b>B2B pricing at scale.</b> Native catalogs are reliable into the low tens of thousands; for very large or highly dynamic contract pricing, use <b>live pricing via Cart Transform</b>.</p></div>
+    <div class="rcard"><p><b>SKUs aren't unique keys.</b> Shopify doesn't enforce SKU uniqueness — multiple variants can share one. Match and sync records on <b>product / variant IDs</b> (and the inventory item ID), never on SKU.</p></div>
+    <div class="rcard"><p><b>B2B pricing at scale.</b> Native catalogs are reliable into the low tens of thousands. Pricing that outgrows that — very large or highly dynamic contract pricing — is a <b>deeper architecture conversation</b>: real-time ERP pricing at checkout can over-burden checkout and is gated to <b>Enterprise</b>.</p></div>
     <div class="rcard"><p><b>Large orders.</b> Cart/checkout/orders cap at <b>500 line items</b> — plan for distributors/wholesale with very large baskets.</p></div>
-    <div class="rcard"><p><b>POS path.</b> The ERP integrates to Shopify <b>admin</b>, not directly to POS. The Purchase Order API isn't GA yet (only Transfers) — verify before scoping POS receiving.</p></div>
+    <div class="rcard"><p><b>POS path.</b> The ERP integrates to Shopify <b>admin</b>, not directly to POS. Purchase orders and receiving are <b>native in admin and POS</b> now; what's still limited is a <b>programmatic PO API</b> to push ERP-generated POs in automatically — verify current API coverage before scoping that.</p></div>
     <div class="rcard"><p><b>Confirm B2B coverage.</b> Don't assume a connector supports B2B primitives (companies, catalogs, price lists) — verify it for the specific tool before you promise B2B.</p></div>
     <div class="rcard"><p><b>Full detail.</b> Per-system paths, segment fit, and contacts live in the <a href="connector-reference.html">Integration Reference</a>.</p></div>
   </div>
@@ -168,7 +182,7 @@
   </ul>
 
   <footer>
-    <p><b>How to use this:</b> start with the play that matches your project, scope with the discovery checklist, design within the platform realities, and use the Integration Reference to pick the right path for the merchant's specific systems. The throughline across all three plays: treat the integration as its own workstream, launch the storefront on a minimum-viable sync, and phase the rest.</p>
+    <p><b>How to use this:</b> start with the play that matches your project, scope with the discovery checklist, design within the platform realities, and use the Integration Reference to pick the right path for the merchant's specific systems. The throughline across all three plays: treat the integration as its own workstream, launch the storefront on a minimum-viable sync, phase the rest — and manage your external dependencies out loud, in the plan and in every status update.</p>
     <p>Spot something wrong or out of date? <a href="https://github.com/michelledrawert-shopify/Shopify-Back-Office-Integration-Guide/issues" target="_blank" rel="noopener">Open an issue on this repo</a> so we can keep it current. &nbsp;·&nbsp; Last updated: June 2026.</p>
   </footer>
 </div>
