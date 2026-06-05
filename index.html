@@ -132,7 +132,7 @@
     <h5>What good looks like — decide where each piece lives</h5>
     <ul class="where">
       <li><span class="k">Catalog &amp; products:</span> synced from the ERP, or maintained in Shopify.</li>
-      <li><span class="k">Pricing:</span> per-company contract pricing from the ERP → native B2B catalogs. Pricing that outgrows catalogs — very large or highly dynamic contract pricing — is a <b>deeper architecture conversation</b>: real-time ERP pricing at checkout can over-burden checkout and is gated to <b>Enterprise</b>. Don't default to it.</li>
+      <li><span class="k">Pricing:</span> per-company contract pricing from the ERP → native B2B catalogs. Pricing that outgrows catalogs — very large or highly dynamic contract pricing — is beyond a self-serve build. Don't design around it here — route it to Shopify Sales.</li>
       <li><span class="k">Companies, locations &amp; buyers:</span> native B2B primitives — <b>confirm your connector/middleware is B2B-aware</b> (the most common wrong assumption).</li>
       <li><span class="k">Order flow:</span> orders placed in Shopify flow to the ERP, and <b>fulfillments flow back to Shopify</b>; define payment terms and draft/PO approval. On <b>manual payment methods</b> (e.g. B2B terms), make sure orders get <b>marked as paid in Shopify</b> once the ERP settles them — otherwise they sit as open/unpaid and break the buyer's order history.</li>
       <li><span class="k">Payment:</span> terms vs. card; make sure orders close out in Shopify.</li>
@@ -167,7 +167,7 @@
   <div class="realities">
     <div class="rcard"><p><b>Reconcile on Shopify's IDs.</b> Match records on <b>order.id</b> and reconcile payments on <b>payment_id</b> (with Shopify Payments) — not on the order name or a gateway-specific ID.</p></div>
     <div class="rcard"><p><b>SKUs aren't unique keys.</b> Shopify doesn't enforce SKU uniqueness — multiple variants can share one. Match and sync records on <b>product / variant IDs</b> (and the inventory item ID), never on SKU.</p></div>
-    <div class="rcard"><p><b>B2B pricing at scale.</b> Native catalogs are reliable into the low tens of thousands. Pricing that outgrows that — very large or highly dynamic contract pricing — is a <b>deeper architecture conversation</b>: real-time ERP pricing at checkout can over-burden checkout and is gated to <b>Enterprise</b>.</p></div>
+    <div class="rcard"><p><b>B2B pricing at scale.</b> Native catalogs are reliable into the low tens of thousands. Pricing that outgrows that — very large or highly dynamic contract pricing — is beyond a self-serve build — route it to Shopify Sales rather than designing around it here.</p></div>
     <div class="rcard"><p><b>Large orders.</b> Cart/checkout/orders cap at <b>500 line items</b> — plan for distributors/wholesale with very large baskets.</p></div>
     <div class="rcard"><p><b>POS path.</b> The ERP integrates to Shopify <b>admin</b>, not directly to POS. Purchase orders and receiving are <b>native in admin and POS</b> now; what's still limited is a <b>programmatic PO API</b> to push ERP-generated POs in automatically — verify current API coverage before scoping that.</p></div>
     <div class="rcard"><p><b>Confirm B2B coverage.</b> Don't assume a connector supports B2B primitives (companies, catalogs, price lists) — verify it for the specific tool before you promise B2B.</p></div>
