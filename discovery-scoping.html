@@ -154,19 +154,35 @@ Notes:
   <h2 class="section">Template 2 · Discovery question set (D2C &amp; B2B)</h2>
   <p class="intro">Run these alongside the SoR map. The shared block applies to every ERP project; use the D2C or B2B block depending on the build.</p>
   <div class="tplhead"><button class="copy" onclick="cp('disc',this)">Copy question set</button></div>
-  <textarea id="disc" class="tplbox" rows="40" readonly spellcheck="false"># ERP + Commerce Discovery — Question Set
+  <textarea id="disc" class="tplbox" rows="82" readonly spellcheck="false"># ERP + Commerce Discovery — Question Set
 
 ## Systems &amp; ownership
 - [ ] Which ERP, which version? Cloud or on-prem?
 - [ ] Is the ERP customized / heavily modified?
 - [ ] Does the ERP expose APIs? What integrations exist today?
 - [ ] Certified connector, middleware (iPaaS), app, or custom?
+- [ ] Is there a usable ERP test / sandbox environment, or only production?
+      (No test env blocks integration testing — flag it early.)
+- [ ] API limits — rate limits, throughput, batch windows? (The ERP API is often the
+      bottleneck.)
+- [ ] Auth &amp; access — OAuth / API keys / IP allowlist / VPN tunnel (on-prem)? Who holds
+      the credentials?
+- [ ] Connector licensing &amp; cost — who pays, and what's the model (per-order /
+      per-connection)?
+- [ ] Any existing integration already writing to the ERP that we'd collide with?
 - [ ] Who owns / builds the integration — partner side AND merchant side?
 - [ ] Who are the IT / ERP / finance stakeholders?
 - [ ] Is ownership a proper RACI? Who owns each data domain (master) — not just one
       integration owner?
 - [ ] Who outside our team is on the critical path (ERP VAR, IT, connector / tax
       vendor) — and what lead time does each need? (Put these in the plan with owners.)
+
+## Architecture &amp; scale
+- [ ] One Shopify store or many (Markets, expansion stores)? One ERP instance / entity
+      or several?
+- [ ] How do stores map to ERP legal entities / companies / warehouses?
+      (Many-to-one is common and changes the whole design.)
+- [ ] Volumes — # SKUs, orders/day, peak (BFCM)? (Drives real-time vs batch and architecture.)
 
 ## System of record  (fill the SoR map)
 - [ ] For each domain — products &amp; content/media, inventory, location master, pricing,
@@ -184,22 +200,48 @@ Notes:
 - [ ] Is an ERP migration / upgrade also underway? Timeline &amp; dependencies?
 - [ ] What is the minimum-viable integration needed to launch?
 - [ ] How clean is the ERP data (catalog / customer / pricing)? Migration + cleanup scope?
+- [ ] Historical migration — how much order / customer / financial history comes over, and
+      from where?
+- [ ] Per domain, real-time or batch? (Recommendation: stream where possible — even hourly
+      batches let Shopify and the ERP drift, for B2B as much as D2C.)
+- [ ] Cutover — big-bang or phased? Is there a data-freeze window?
+- [ ] Open transactions at cutover — in-flight orders, partial fulfillments, open AR: how
+      are they handled?
 - [ ] What specific reports does the merchant need? (Reporting requirements dictate what
       must sync and how clean the data has to be.)
 - [ ] When is the financial year-end? (Sequence the cutover around it — don't migrate
       finance mid-year.)
 
+## Failure handling &amp; operations (day-2)
+- [ ] When a sync fails — retry, alert, dead-letter, or manual fix? What's the path?
+- [ ] Who monitors the integration and gets paged after go-live? (Name the day-2 owner —
+      it's almost always left undefined.)
+- [ ] Reconciliation — how do we detect and correct drift (inventory / order / financial
+      mismatch)?
+- [ ] Idempotency — how are duplicate orders / records prevented? (Duplicated orders in the
+      ERP is the classic post-launch fire.)
+- [ ] Where do we look when it breaks — logs, dashboards, vendor support SLA?
+
+## Payments &amp; finance
+- [ ] Payment methods — Shopify Payments, other gateways, offline / manual for B2B net terms?
+- [ ] Payout reconciliation — how do Shopify Payments payouts map to the GL?
+- [ ] Refunds — initiated in Shopify or ERP, and how do they sync back?
+
 ## D2C specifics
-- [ ] Order / inventory / fulfillment sync — real-time or batch?
-      (Recommendation: stream data in where possible rather than batching — even
-       hourly batches let Shopify and the ERP drift out of sync.)
+- [ ] Multi-location inventory, safety-stock buffers, available-to-promise logic?
+- [ ] Subscriptions / recurring orders in scope? Who's the system of record?
+- [ ] Gift cards / store credit — where issued and redeemed?
 - [ ] Returns &amp; exchanges flow — where is it recorded?
 - [ ] Tax engine — Shopify Tax / Avalara / Vertex / other?
 
 ## B2B specifics
 - [ ] Contract / customer-specific pricing — how many price points or catalogs?
 - [ ] Company / location / buyer hierarchy?
+- [ ] Quotes / draft-order (RFQ) flow — who creates, who approves?
 - [ ] Payment terms, credit limits, draft / PO approval flows?
+- [ ] Net-terms / credit-hold enforcement — does the ERP gate the order at checkout?
+- [ ] Invoicing — ERP-generated or Shopify? Tax exemption-certificate handling?
+- [ ] Backorders — common in B2B; how represented across systems?
 - [ ] Where do reps place orders today — and where should they after launch?
 - [ ] Is the connector / middleware B2B-aware (companies, catalogs, price lists)?</textarea>
 
