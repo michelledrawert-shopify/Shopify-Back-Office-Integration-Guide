@@ -247,11 +247,11 @@ Notes:
 
   <h2 class="section">From discovery to scope</h2>
   <div class="scopegrid">
-    <div class="scard"><h4>Split into workstreams</h4><p>Storefront build · integration · data migration · ERP-side changes. Each can have its own track and owner.</p></div>
+    <div class="scard"><h4>Split into workstreams</h4><p>Storefront build · integration · data migration · ERP-side changes · testing/UAT · cutover · day-2 ops. Each can have its own track and owner.</p></div>
     <div class="scard"><h4>Turn the SoR map into a contract</h4><p>Convert the map into a concrete list: object × direction × frequency × phase — plus, per row, the <b>match key</b> that joins the record across systems and the <b>winner</b> when a 2-way sync conflicts.</p></div>
     <div class="scard"><h4>Define minimum-viable integration</h4><p>The "Y to launch" rows = Phase 0. Everything else is a later phase. Protect the launch date.</p></div>
     <div class="scard"><h4>Sequence concurrent work</h4><p>If an ERP migration is also happening, decouple timelines — usually launch Shopify on the current ERP first.</p></div>
-    <div class="scard"><h4>Signal the complexity</h4><p>Low / Med / High from the drivers: no certified connector, on-prem/legacy, real-time bidirectional, customization, B2B primitives.</p></div>
+    <div class="scard"><h4>Signal the complexity</h4><p>Low / Med / High from the drivers: no certified connector, on-prem/legacy, real-time bidirectional, customization, B2B primitives, multi-store/multi-entity, high volume/peak, no test environment.</p></div>
     <div class="scard"><h4>Make ownership a RACI</h4><p>Go past a single integration owner to a proper <b>RACI</b>, and name who owns each <b>data domain</b> (master). Capture dependencies, assumptions, and the risks you'd flag to the merchant.</p></div>
     <div class="scard"><h4>Put external dependencies in the plan</h4><p>List every party outside your team on the critical path — <b>ERP VAR, merchant IT, connector/tax vendor</b> — each with an <b>owner and a lead time</b>, and review them in <b>every status update</b>. Their work won't move just because yours is ready; "waiting on the VAR" is the usual reason these timelines slip.</p></div>
     <div class="scard"><h4>Pin reporting &amp; year-end</h4><p><b>Reporting requirements</b> dictate what has to sync and how clean it must be — capture them early. And <b>sequence the cutover around the financial year-end</b>, not mid-year.</p></div>
@@ -260,28 +260,46 @@ Notes:
   <h2 class="section">Template 3 · Project scope skeleton</h2>
   <p class="intro">A starting SOW structure for an ERP-involved build. Fill it from the SoR map and the discovery answers.</p>
   <div class="tplhead"><button class="copy" onclick="cp('scope',this)">Copy scope skeleton</button></div>
-  <textarea id="scope" class="tplbox" rows="48" readonly spellcheck="false"># ERP-Involved Shopify Project — Scope Skeleton — [Merchant]
+  <textarea id="scope" class="tplbox" rows="98" readonly spellcheck="false"># ERP-Involved Shopify Project — Scope Skeleton — [Merchant]
 
 ## Workstreams
 - Storefront build:
 - Integration (ERP ↔ Shopify):
 - Data migration:
 - ERP-side changes:
+- Testing &amp; UAT:
+- Cutover &amp; go-live:
+- Operations / support (day-2):
+
+## Architecture &amp; environments
+- Shopify footprint (one store / many — Markets, expansion stores):
+- ERP footprint (one instance / multiple entities or companies):
+- Store ↔ ERP entity / company / warehouse mapping:
+- Volumes (# SKUs, orders/day, peak / BFCM):
+- Environments (ERP test / sandbox? Shopify dev / staging):
+- API limits, auth method, network access (VPN / IP allowlist):
 
 ## Integration contract  (from the SoR map)
-| Object                | System of record | Direction     | Match key      | Frequency | Phase |
-|-----------------------|------------------|---------------|----------------|-----------|-------|
-| Orders                | Shopify          | Shopify → ERP | order #        | real-time | 0     |
-| Inventory             | ERP              | ERP → Shopify | SKU / GTIN     |           |       |
-| Products / catalog    |                  |               | SKU / GTIN     |           |       |
-| Pricing               |                  |               | SKU + cust/grp |           |       |
-| Customers / companies |                  |               | customer ID    |           |       |
-| Fulfillment           |                  |               | order #        |           |       |
-| Returns / refunds     |                  |               | order # / RMA  |           |       |
-| Suppliers / POs       |                  |               | vendor / PO #  |           |       |
-| Payouts / settlement  | Shopify          | Shopify → ERP | payout ID      |           |       |
-| Financials / tax      |                  |               |                |           |       |
-| AP / AR               |                  |               |                |           |       |
+| Object                    | System of record | Direction     | Conflict (2-way) | Match key      | Frequency | Phase |
+|---------------------------|------------------|---------------|------------------|----------------|-----------|-------|
+| Orders                    | Shopify          | Shopify → ERP | n/a              | order #        | real-time | 0     |
+| Inventory                 | ERP              | ERP → Shopify | n/a              | SKU / GTIN     |           |       |
+| Products / catalog        |                  |               |                  | SKU / GTIN     |           |       |
+| Product content / media   |                  |               |                  | SKU / GTIN     |           |       |
+| Pricing                   |                  |               |                  | SKU + cust/grp |           |       |
+| Promotions / discounts    |                  |               |                  | promo / code   |           |       |
+| Customers / companies     |                  |               |                  | customer ID    |           |       |
+| Fulfillment               |                  |               |                  | order #        |           |       |
+| Returns / refunds         |                  |               |                  | order # / RMA  |           |       |
+| Gift cards / store credit |                  |               |                  | card ID        |           |       |
+| Payouts / settlement      | Shopify          | Shopify → ERP | n/a              | payout ID      |           |       |
+| COGS / landed cost        |                  |               |                  | SKU            |           |       |
+| Multi-currency / FX       |                  |               |                  | currency       |           |       |
+| Invoicing (B2B)           |                  |               |                  | invoice #      |           |       |
+| Suppliers / POs           |                  |               |                  | vendor / PO #  |           |       |
+| Financials / GL           |                  |               |                  | journal ref    |           |       |
+| Tax                       |                  |               |                  | jurisdiction   |           |       |
+| AP / AR                   |                  |               |                  | invoice #      |           |       |
 
 ## Minimum-viable integration  (Phase 0 — required to launch)
 -
@@ -294,27 +312,46 @@ Notes:
 ## Sequencing
 - Concurrent ERP migration? (Y/N):
 - Sequence / interim integration:
+- Historical data to migrate (orders / customers / financials) + source:
 
-## Reporting &amp; cutover timing
-- Reporting requirements (drive sync scope + how clean the data must be):
+## Cutover &amp; go-live
+- Cutover approach (big-bang / phased):
+- Data-freeze window:
+- Open transactions at cutover (in-flight orders, partial fulfillments, open AR):
+- Rollback plan:
 - Financial year-end (sequence the cutover around it, not mid-year):
 
+## Operations &amp; support (day-2)
+- Monitoring &amp; alerting (who is paged when a sync fails):
+- Error handling (retry / dead-letter / manual-fix path):
+- Reconciliation cadence (detect &amp; correct drift — inventory / order / financial):
+- Support model &amp; SLA (partner / connector vendor / merchant IT):
+- Runbook owner:
+
+## Reporting &amp; analytics
+- Reporting requirements (drive sync scope + how clean the data must be):
+- Single source of truth for finance / ops reporting:
+
 ## External dependencies  (review every status update — not logged once)
-| Dependency / who owns it            | Needed by | Lead time | Status |
-|-------------------------------------|-----------|-----------|--------|
-| ERP connector build (VAR / vendor)  |           |           |        |
-| Merchant IT (API access, creds, env)|           |           |        |
-| Tax engine setup                    |           |           |        |
-| ERP-side data cleanup / readiness   |           |           |        |
+| Dependency / who owns it                   | Needed by | Lead time | Status |
+|--------------------------------------------|-----------|-----------|--------|
+| ERP connector build (VAR / vendor)         |           |           |        |
+| Merchant IT (API access, creds, env)       |           |           |        |
+| Tax engine setup                           |           |           |        |
+| ERP-side data cleanup / readiness          |           |           |        |
+| Connector license / commercials (who pays) |           |           |        |
+| Day-2 monitoring / support (post-launch)   |           |           |        |
 
 ## Complexity:  Low / Medium / High
-- Drivers present:  [ ] no certified connector   [ ] on-prem / legacy ERP
-                    [ ] real-time bidirectional  [ ] heavy customization
-                    [ ] B2B primitives required
+- Drivers present:  [ ] no certified connector      [ ] on-prem / legacy ERP
+                    [ ] real-time bidirectional     [ ] heavy customization
+                    [ ] B2B primitives required     [ ] multi-store / multi-entity
+                    [ ] high volume / seasonal peak  [ ] no usable test environment
 
 ## Ownership (RACI — by data domain)
 - Integration owner (partner):
 - Merchant IT / ERP / data owner:
+- Day-2 ops / monitoring owner (post-launch):
 - RACI per master (products, inventory, suppliers/POs, orders, fulfillment, AP/AR):
 
 ## Risks &amp; assumptions
