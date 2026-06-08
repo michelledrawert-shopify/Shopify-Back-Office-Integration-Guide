@@ -90,31 +90,66 @@
   </ul>
 
   <h2 class="section">Template 1 · System-of-Record Map</h2>
-  <p class="intro">The centerpiece of the discovery. For each domain, agree <b>which system owns it post-launch</b>, the <b>sync direction</b>, and whether it's <b>required to launch</b> (Phase 0) or can come later. Fill this live, with IT in the room.</p>
+  <p class="intro">The centerpiece of the discovery. For each domain, agree <b>which system owns it post-launch</b>, the <b>sync direction</b>, the <b>winner if it syncs 2-way</b>, and whether it's <b>required to launch</b> (Phase 0) or can come later. Domains are grouped — catalog/pricing/inventory · customers/orders · B2B · finance/procurement — so trim the rows that don't apply. Fill this live, with IT in the room.</p>
   <div class="tplhead"><button class="copy" onclick="cp('sor',this)">Copy template</button></div>
-  <textarea id="sor" class="tplbox" rows="20" readonly spellcheck="false"># System-of-Record Map — [Merchant]
+  <textarea id="sor" class="tplbox" rows="56" readonly spellcheck="false"># System-of-Record Map — [Merchant]
 
-| Data domain              | System of record  | Sync direction        | Needed to launch? |
-|--------------------------|-------------------|-----------------------|-------------------|
-| Products / catalog       | ERP / Shopify     | ERP → Shopify / 2-way | Y / N             |
-| Inventory                | ERP / Shopify     | ERP → Shopify         | Y / N             |
-| Pricing (incl. B2B)      | ERP / Shopify     | ERP → Shopify         | Y / N             |
-| Customers / companies    | ERP / Shopify     | 2-way                 | Y / N             |
-| Orders                   | Shopify / ERP     | Shopify → ERP         | Y / N             |
-| Fulfillment / shipping   | ERP / Shopify     | 2-way                 | Y / N             |
-| Suppliers / vendors      | ERP / inventory   | —                     | Y / N             |
-| Purchase orders          | ERP / inventory   | —                     | Y / N             |
-| Accounts payable (AP)    | ERP / accounting  | —                     | Y / N             |
-| Accounts receivable (AR) | ERP / accounting  | —                     | Y / N             |
-| Financials / payments    | ERP / accounting  | Shopify → ledger      | Y / N             |
-| Tax                      | ERP / engine      | —                     | Y / N             |
-| Returns / RMA            | ERP / Shopify     | —                     | Y / N             |
+## Catalog, pricing & inventory
+| Data domain                   | System of record    | Sync direction        | Winner (2-way) | Needed to launch? |
+|-------------------------------|---------------------|-----------------------|----------------|-------------------|
+| Products / catalog            | ERP / Shopify       | ERP → Shopify / 2-way | ERP / Shopify  | Y / N             |
+| Product content / media       | PIM / DAM / Shopify | PIM → Shopify         | n/a            | Y / N             |
+| Inventory                     | ERP / WMS           | ERP → Shopify         | n/a            | Y / N             |
+| Location master               | ERP / Shopify       | ERP → Shopify         | n/a            | Y / N             |
+| Pricing                       | ERP / Shopify       | ERP → Shopify         | n/a            | Y / N             |
+| Promotions / discounts        | Shopify / ERP       | Shopify → ERP         | ERP / Shopify  | Y / N             |
+
+## Customers, orders & post-purchase
+| Data domain                   | System of record    | Sync direction        | Winner (2-way) | Needed to launch? |
+|-------------------------------|---------------------|-----------------------|----------------|-------------------|
+| Customers / companies         | ERP / Shopify       | 2-way                 | ERP / Shopify  | Y / N             |
+| Orders                        | Shopify / ERP       | Shopify → ERP         | n/a            | Y / N             |
+| Fulfillment / shipping        | ERP / WMS / Shopify | 2-way                 | ERP / Shopify  | Y / N             |
+| Returns / RMA                 | ERP / Shopify       | 2-way                 | ERP / Shopify  | Y / N             |
+| Refunds                       | Shopify / ERP       | 2-way                 | ERP / Shopify  | Y / N             |
+| Gift cards / store credit     | Shopify / ERP       | Shopify → ledger      | n/a            | Y / N             |
+
+## B2B-specific
+| Data domain                   | System of record    | Sync direction        | Winner (2-way) | Needed to launch? |
+|-------------------------------|---------------------|-----------------------|----------------|-------------------|
+| Contract pricing / catalogs   | ERP / Shopify       | ERP → Shopify         | n/a            | Y / N             |
+| Credit terms / limits / holds | ERP                 | ERP → Shopify         | n/a            | Y / N             |
+| Invoicing                     | ERP                 | ERP → Shopify         | n/a            | Y / N             |
+| Tax exemption certificates    | ERP / engine        | —                     | n/a            | Y / N             |
+
+## Finance & procurement
+| Data domain                   | System of record    | Sync direction        | Winner (2-way) | Needed to launch? |
+|-------------------------------|---------------------|-----------------------|----------------|-------------------|
+| Suppliers / vendors           | ERP                 | —                     | n/a            | Y / N             |
+| Purchase orders               | ERP                 | —                     | n/a            | Y / N             |
+| Accounts payable (AP)         | ERP / accounting    | —                     | n/a            | Y / N             |
+| Accounts receivable (AR)      | ERP / accounting    | —                     | n/a            | Y / N             |
+| Payment settlement / payouts  | Shopify             | Shopify → ERP         | n/a            | Y / N             |
+| Financials / GL               | ERP / accounting    | Shopify → ledger      | n/a            | Y / N             |
+| Cost / COGS / landed cost     | ERP                 | ERP → Shopify         | n/a            | Y / N             |
+| Multi-currency / FX           | ERP / Shopify       | ERP → Shopify         | n/a            | Y / N             |
+| Tax                           | engine / ERP        | —                     | n/a            | Y / N             |
 
 Notes:
-- Don't stop at commerce data — the finance & procurement masters (suppliers, POs, AP, AR)
-  are where reconciliation and month-end actually break, so settle who owns each.
-- "Needed to launch? = Y" defines the minimum-viable integration (Phase 0).
-- Anything "N" is phased after go-live.</textarea>
+- Winner (2-way): for every "2-way" row, name who wins when both sides change the same
+  record. "2-way" with no tiebreaker is an unresolved decision dressed up as a decision.
+- Match key: also agree the identifier that joins each record across systems (SKU / GTIN,
+  customer ID, order #). Integrations fail on identity resolution, not on direction.
+- "Products" rarely has one owner: description/media may live in a PIM, price in the ERP,
+  inventory in a WMS, collections in Shopify. Split a domain to field-level ownership the
+  moment the owners differ — don't relitigate it during the build.
+- Don't stop at commerce data — the finance & procurement masters (suppliers, POs, AP, AR,
+  COGS, payouts) are where reconciliation and month-end actually break, so settle who owns each.
+- "Needed to launch? = Y" defines the minimum-viable integration (Phase 0). Anything "N" is
+  phased after go-live — and for each "N", write down the manual workaround until it's
+  automated. That interim manual process is usually the hidden launch risk.
+- Add rows as the build needs them: subscriptions, loyalty / rewards, marketing consent
+  (CDP / ESP), lot / serial / batch for regulated goods.</textarea>
 
   <h2 class="section">Template 2 · Discovery question set (D2C &amp; B2B)</h2>
   <p class="intro">Run these alongside the SoR map. The shared block applies to every ERP project; use the D2C or B2B block depending on the build.</p>
@@ -134,9 +169,16 @@ Notes:
       vendor) — and what lead time does each need? (Put these in the plan with owners.)
 
 ## System of record  (fill the SoR map)
-- [ ] Products, inventory, pricing, customers, orders, fulfillment, financials, tax,
-      suppliers/vendors, purchase orders, AP, AR — who owns each after launch, and
-      which way does it sync?
+- [ ] For each domain — products &amp; content/media, inventory, location master, pricing,
+      promotions, customers/companies, orders, fulfillment, returns, refunds, gift cards,
+      suppliers/vendors, POs, AP, AR, invoicing, payouts/settlement, financials/GL, COGS,
+      multi-currency, tax &amp; exemption certs — who owns it after launch, and which way
+      does it sync?
+- [ ] For every 2-way domain, who wins when both sides change the same record?
+- [ ] What is the match key that joins each record across systems (SKU/GTIN, customer ID,
+      order #)? Identity mismatches break syncs more often than direction does.
+- [ ] For every domain NOT automated at launch, what is the interim manual workaround?
+      (That's the hidden launch risk.)
 
 ## Sequencing &amp; data
 - [ ] Is an ERP migration / upgrade also underway? Timeline &amp; dependencies?
@@ -164,7 +206,7 @@ Notes:
   <h2 class="section">From discovery to scope</h2>
   <div class="scopegrid">
     <div class="scard"><h4>Split into workstreams</h4><p>Storefront build · integration · data migration · ERP-side changes. Each can have its own track and owner.</p></div>
-    <div class="scard"><h4>Turn the SoR map into a contract</h4><p>Convert the map into a concrete list: object × direction × frequency × phase.</p></div>
+    <div class="scard"><h4>Turn the SoR map into a contract</h4><p>Convert the map into a concrete list: object × direction × frequency × phase — plus, per row, the <b>match key</b> that joins the record across systems and the <b>winner</b> when a 2-way sync conflicts.</p></div>
     <div class="scard"><h4>Define minimum-viable integration</h4><p>The "Y to launch" rows = Phase 0. Everything else is a later phase. Protect the launch date.</p></div>
     <div class="scard"><h4>Sequence concurrent work</h4><p>If an ERP migration is also happening, decouple timelines — usually launch Shopify on the current ERP first.</p></div>
     <div class="scard"><h4>Signal the complexity</h4><p>Low / Med / High from the drivers: no certified connector, on-prem/legacy, real-time bidirectional, customization, B2B primitives.</p></div>
@@ -185,17 +227,19 @@ Notes:
 - ERP-side changes:
 
 ## Integration contract  (from the SoR map)
-| Object              | System of record | Direction     | Frequency  | Phase |
-|---------------------|------------------|---------------|------------|-------|
-| Orders              | Shopify          | Shopify → ERP | real-time  | 0     |
-| Inventory           | ERP              | ERP → Shopify |            |       |
-| Products / catalog  |                  |               |            |       |
-| Pricing             |                  |               |            |       |
-| Customers/companies |                  |               |            |       |
-| Fulfillment         |                  |               |            |       |
-| Suppliers / POs     |                  |               |            |       |
-| Financials / tax    |                  |               |            |       |
-| AP / AR             |                  |               |            |       |
+| Object                | System of record | Direction     | Match key      | Frequency | Phase |
+|-----------------------|------------------|---------------|----------------|-----------|-------|
+| Orders                | Shopify          | Shopify → ERP | order #        | real-time | 0     |
+| Inventory             | ERP              | ERP → Shopify | SKU / GTIN     |           |       |
+| Products / catalog    |                  |               | SKU / GTIN     |           |       |
+| Pricing               |                  |               | SKU + cust/grp |           |       |
+| Customers / companies |                  |               | customer ID    |           |       |
+| Fulfillment           |                  |               | order #        |           |       |
+| Returns / refunds     |                  |               | order # / RMA  |           |       |
+| Suppliers / POs       |                  |               | vendor / PO #  |           |       |
+| Payouts / settlement  | Shopify          | Shopify → ERP | payout ID      |           |       |
+| Financials / tax      |                  |               |                |           |       |
+| AP / AR               |                  |               |                |           |       |
 
 ## Minimum-viable integration  (Phase 0 — required to launch)
 -
