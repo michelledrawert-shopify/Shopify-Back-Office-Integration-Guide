@@ -83,7 +83,7 @@
   <ul class="who">
     <li><b>Merchant ecom / digital lead</b> — storefront, merchandising, go-live goals.</li>
     <li><b>IT / ERP admin or owner</b> — the ERP's reality: version, hosting, APIs, existing integrations.</li>
-    <li><b>Finance / operations</b> — financials, tax, reconciliation expectations.</li>
+    <li><b>Finance / operations</b> — financials, tax, <b>AP/AR and month-end</b> reconciliation, reporting requirements.</li>
     <li><b>ERP implementer / VAR</b> — who actually builds/maintains the ERP side (often a separate firm).</li>
     <li><b>Wholesale / sales lead</b> (B2B) — contract pricing, buyer structure, how reps order today.</li>
     <li><b>The integration owner</b> — one accountable person on each side (partner + merchant).</li>
@@ -92,28 +92,34 @@
   <h2 class="section">Template 1 · System-of-Record Map</h2>
   <p class="intro">The centerpiece of the discovery. For each domain, agree <b>which system owns it post-launch</b>, the <b>sync direction</b>, and whether it's <b>required to launch</b> (Phase 0) or can come later. Fill this live, with IT in the room.</p>
   <div class="tplhead"><button class="copy" onclick="cp('sor',this)">Copy template</button></div>
-  <textarea id="sor" class="tplbox" rows="14" readonly spellcheck="false"># System-of-Record Map — [Merchant]
+  <textarea id="sor" class="tplbox" rows="20" readonly spellcheck="false"># System-of-Record Map — [Merchant]
 
-| Data domain             | System of record | Sync direction        | Needed to launch? |
-|-------------------------|------------------|-----------------------|-------------------|
-| Products / catalog      | ERP / Shopify    | ERP → Shopify / 2-way | Y / N             |
-| Inventory               | ERP / Shopify    | ERP → Shopify         | Y / N             |
-| Pricing (incl. B2B)     | ERP / Shopify    | ERP → Shopify         | Y / N             |
-| Customers / companies   | ERP / Shopify    | 2-way                 | Y / N             |
-| Orders                  | Shopify / ERP    | Shopify → ERP         | Y / N             |
-| Fulfillment / shipping  | ERP / Shopify    | 2-way                 | Y / N             |
-| Financials / payments   | ERP / Shopify    | Shopify → ERP         | Y / N             |
-| Tax                     | ERP / engine     | —                     | Y / N             |
-| Returns / RMA           | ERP / Shopify    | —                     | Y / N             |
+| Data domain              | System of record  | Sync direction        | Needed to launch? |
+|--------------------------|-------------------|-----------------------|-------------------|
+| Products / catalog       | ERP / Shopify     | ERP → Shopify / 2-way | Y / N             |
+| Inventory                | ERP / Shopify     | ERP → Shopify         | Y / N             |
+| Pricing (incl. B2B)      | ERP / Shopify     | ERP → Shopify         | Y / N             |
+| Customers / companies    | ERP / Shopify     | 2-way                 | Y / N             |
+| Orders                   | Shopify / ERP     | Shopify → ERP         | Y / N             |
+| Fulfillment / shipping   | ERP / Shopify     | 2-way                 | Y / N             |
+| Suppliers / vendors      | ERP / inventory   | —                     | Y / N             |
+| Purchase orders          | ERP / inventory   | —                     | Y / N             |
+| Accounts payable (AP)    | ERP / accounting  | —                     | Y / N             |
+| Accounts receivable (AR) | ERP / accounting  | —                     | Y / N             |
+| Financials / payments    | ERP / accounting  | Shopify → ledger      | Y / N             |
+| Tax                      | ERP / engine      | —                     | Y / N             |
+| Returns / RMA            | ERP / Shopify     | —                     | Y / N             |
 
 Notes:
+- Don't stop at commerce data — the finance & procurement masters (suppliers, POs, AP, AR)
+  are where reconciliation and month-end actually break, so settle who owns each.
 - "Needed to launch? = Y" defines the minimum-viable integration (Phase 0).
 - Anything "N" is phased after go-live.</textarea>
 
   <h2 class="section">Template 2 · Discovery question set (D2C &amp; B2B)</h2>
   <p class="intro">Run these alongside the SoR map. The shared block applies to every ERP project; use the D2C or B2B block depending on the build.</p>
   <div class="tplhead"><button class="copy" onclick="cp('disc',this)">Copy question set</button></div>
-  <textarea id="disc" class="tplbox" rows="34" readonly spellcheck="false"># ERP + Commerce Discovery — Question Set
+  <textarea id="disc" class="tplbox" rows="40" readonly spellcheck="false"># ERP + Commerce Discovery — Question Set
 
 ## Systems &amp; ownership
 - [ ] Which ERP, which version? Cloud or on-prem?
@@ -122,17 +128,24 @@ Notes:
 - [ ] Certified connector, middleware (iPaaS), app, or custom?
 - [ ] Who owns / builds the integration — partner side AND merchant side?
 - [ ] Who are the IT / ERP / finance stakeholders?
+- [ ] Is ownership a proper RACI? Who owns each data domain (master) — not just one
+      integration owner?
 - [ ] Who outside our team is on the critical path (ERP VAR, IT, connector / tax
       vendor) — and what lead time does each need? (Put these in the plan with owners.)
 
 ## System of record  (fill the SoR map)
-- [ ] Products, inventory, pricing, customers, orders, fulfillment, financials, tax —
-      who owns each after launch, and which way does it sync?
+- [ ] Products, inventory, pricing, customers, orders, fulfillment, financials, tax,
+      suppliers/vendors, purchase orders, AP, AR — who owns each after launch, and
+      which way does it sync?
 
 ## Sequencing &amp; data
 - [ ] Is an ERP migration / upgrade also underway? Timeline &amp; dependencies?
 - [ ] What is the minimum-viable integration needed to launch?
 - [ ] How clean is the ERP data (catalog / customer / pricing)? Migration + cleanup scope?
+- [ ] What specific reports does the merchant need? (Reporting requirements dictate what
+      must sync and how clean the data has to be.)
+- [ ] When is the financial year-end? (Sequence the cutover around it — don't migrate
+      finance mid-year.)
 
 ## D2C specifics
 - [ ] Order / inventory / fulfillment sync — real-time or batch?
@@ -155,14 +168,15 @@ Notes:
     <div class="scard"><h4>Define minimum-viable integration</h4><p>The "Y to launch" rows = Phase 0. Everything else is a later phase. Protect the launch date.</p></div>
     <div class="scard"><h4>Sequence concurrent work</h4><p>If an ERP migration is also happening, decouple timelines — usually launch Shopify on the current ERP first.</p></div>
     <div class="scard"><h4>Signal the complexity</h4><p>Low / Med / High from the drivers: no certified connector, on-prem/legacy, real-time bidirectional, customization, B2B primitives.</p></div>
-    <div class="scard"><h4>Name owners &amp; log risks</h4><p>One integration owner per side; capture dependencies, assumptions, and the risks you'd flag to the merchant.</p></div>
+    <div class="scard"><h4>Make ownership a RACI</h4><p>Go past a single integration owner to a proper <b>RACI</b>, and name who owns each <b>data domain</b> (master). Capture dependencies, assumptions, and the risks you'd flag to the merchant.</p></div>
     <div class="scard"><h4>Put external dependencies in the plan</h4><p>List every party outside your team on the critical path — <b>ERP VAR, merchant IT, connector/tax vendor</b> — each with an <b>owner and a lead time</b>, and review them in <b>every status update</b>. Their work won't move just because yours is ready; "waiting on the VAR" is the usual reason these timelines slip.</p></div>
+    <div class="scard"><h4>Pin reporting &amp; year-end</h4><p><b>Reporting requirements</b> dictate what has to sync and how clean it must be — capture them early. And <b>sequence the cutover around the financial year-end</b>, not mid-year.</p></div>
   </div>
 
   <h2 class="section">Template 3 · Project scope skeleton</h2>
   <p class="intro">A starting SOW structure for an ERP-involved build. Fill it from the SoR map and the discovery answers.</p>
   <div class="tplhead"><button class="copy" onclick="cp('scope',this)">Copy scope skeleton</button></div>
-  <textarea id="scope" class="tplbox" rows="38" readonly spellcheck="false"># ERP-Involved Shopify Project — Scope Skeleton — [Merchant]
+  <textarea id="scope" class="tplbox" rows="48" readonly spellcheck="false"># ERP-Involved Shopify Project — Scope Skeleton — [Merchant]
 
 ## Workstreams
 - Storefront build:
@@ -179,7 +193,9 @@ Notes:
 | Pricing             |                  |               |            |       |
 | Customers/companies |                  |               |            |       |
 | Fulfillment         |                  |               |            |       |
+| Suppliers / POs     |                  |               |            |       |
 | Financials / tax    |                  |               |            |       |
+| AP / AR             |                  |               |            |       |
 
 ## Minimum-viable integration  (Phase 0 — required to launch)
 -
@@ -192,6 +208,10 @@ Notes:
 ## Sequencing
 - Concurrent ERP migration? (Y/N):
 - Sequence / interim integration:
+
+## Reporting &amp; cutover timing
+- Reporting requirements (drive sync scope + how clean the data must be):
+- Financial year-end (sequence the cutover around it, not mid-year):
 
 ## External dependencies  (review every status update — not logged once)
 | Dependency / who owns it            | Needed by | Lead time | Status |
@@ -206,16 +226,17 @@ Notes:
                     [ ] real-time bidirectional  [ ] heavy customization
                     [ ] B2B primitives required
 
-## Ownership
+## Ownership (RACI — by data domain)
 - Integration owner (partner):
-- Merchant IT / ERP owner:
+- Merchant IT / ERP / data owner:
+- RACI per master (products, inventory, suppliers/POs, orders, fulfillment, AP/AR):
 
 ## Risks &amp; assumptions
 -</textarea>
 
   <h2 class="section">Resources</h2>
   <ul class="refs">
-    <li><b><a href="index.html">ERP Launch Playbook</a> —</b> the three plays for ERP-involved launches and what good looks like.</li>
+    <li><b><a href="index.html">ERP Launch Playbook</a> —</b> the four plays for ERP-involved launches and what good looks like.</li>
     <li><b><a href="connector-reference.html">Integration Reference</a> —</b> which back-office system maps to which Shopify integration path, with vendor contacts.</li>
     <li><b>Shopify.dev —</b> <a href="https://shopify.dev/docs/apps/build/b2b" target="_blank" rel="noopener">B2B</a>, <a href="https://shopify.dev/docs/api/functions/latest/cart-transform" target="_blank" rel="noopener">Cart Transform Functions</a>, <a href="https://shopify.dev/docs/api/admin-graphql" target="_blank" rel="noopener">Admin API</a>.</li>
   </ul>
