@@ -80,6 +80,7 @@
   .pathline{font-size:12.5px; color:var(--dim); margin-top:9px; border-top:1px dashed var(--line); padding-top:8px}
   .pathline .pv{color:var(--amber); font-weight:600}
   .support{color:var(--emerald)}
+  .pathline .aslink{color:var(--cyan); font-weight:600; white-space:nowrap}
   .empty{color:var(--dim); text-align:center; padding:40px; font-size:14px}
 
   .gotchas{display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:12px}
@@ -112,6 +113,7 @@
     </div>
     <div class="pcard tiers">
       <h3>Pick your integration path</h3>
+      <p>Native/config first — then work down this order, custom last:</p>
       <ol>
         <li><b>1P / certified connector</b> — least effort, vendor-supported</li>
         <li><b>Certified middleware (iPaaS)</b> — Celigo, Jitterbit, Pipe17, VL Omni</li>
@@ -121,7 +123,7 @@
     </div>
     <div class="pcard">
       <h3>POS reality</h3>
-      <p>Nothing integrates <b>directly</b> to POS without a POS UI extension. POS orders flow through Shopify <b>admin</b>, and the back-office system integrates to admin. Purchase Orders: the <b>Purchase Order API isn't yet generally available</b> — only the Transfers API. Verify current status before scoping.</p>
+      <p>Nothing integrates <b>directly</b> to POS without a POS UI extension. POS orders flow through Shopify <b>admin</b>, and the back-office system integrates to admin. Purchase orders and receiving are <b>native in admin and POS</b> now; what's still limited is a <b>programmatic PO API</b> to push ERP-generated POs in automatically — verify current API coverage before scoping that.</p>
     </div>
     <div class="pcard">
       <h3>The two keys you'll need</h3>
@@ -175,132 +177,129 @@ const PATHLABEL={'1P':'1P / certified connector','iPaaS':'Certified middleware (
 
 const DATA=[
 /* ===== ERP ===== */
-{n:'NetSuite (Oracle)',c:'ERP',seg:['MM','ENT'],path:'1P',pos:'Yes (via connector)',b2b:'Yes',sup:'Oracle NetSuite Connector (App Store: “Oracle NetSuite”) · or middleware: Celigo, Patchworks, VL Omni, Pipe17, Jitterbit',
- note:'The most common ERP you\'ll meet. The 1P connector fits SMB→mid; bigger/complex setups use middleware. <b>B2B is supported via the certified connector</b> — confirm current B2B feature coverage with NetSuite before scoping. If payments are captured in NetSuite, those payouts won\'t appear in Shopify finance reports — set that expectation with the merchant up front.'},
-{n:'Acumatica',c:'ERP',seg:['SMB','MM'],path:'1P',pos:'Yes',b2b:'Partial',sup:'Kensium-built certified connector + the merchant\'s Acumatica VAR',
- note:'Solid certified connector. It receives the estimated shipping fee in the order payload (you map zones/methods in the connector). Confirm the merchant\'s VAR knows the connector before you commit timelines.'},
-{n:'MS Dynamics 365 Business Central',c:'ERP',seg:['SMB','MM'],path:'1P',pos:'Backend only',b2b:'Partial',sup:'Microsoft (free, ships inside BC) — set up via the merchant\'s Microsoft VAR',
- note:'The SMB Microsoft ERP. <b>Admin/backend integration, not POS-focused.</b> B2B: price sync yes, SKUs stay in Shopify, <b>quotes/draft orders are NOT synced</b>. No native category mapping → watch for tax estimate-vs-recalc gaps. Extensible via the BC GitHub.'},
+{n:'NetSuite (Oracle)',c:'ERP',seg:['SMB','MM','ENT'],path:'1P',pos:'Yes (via connector)',b2b:'Yes',sup:'NetSuite ERP Connector (App Store, by Oracle NetSuite) · or middleware: Celigo, Patchworks, VL Omni, Pipe17, Jitterbit',
+ note:'The most common ERP you\'ll meet. The certified connector is <b>Oracle-built (not Shopify first-party)</b>, and Celigo is the most common middleware path; it fits SMB→mid, with bigger or heavily-customized setups leaning on middleware. <b>B2B is supported via the certified connector</b> — confirm current B2B feature coverage with NetSuite before scoping. If payments are captured in NetSuite, those payouts won\'t appear in Shopify finance reports — set that expectation with the merchant up front.', url:'https://apps.shopify.com/oracle-netsuite'},
+{n:'Acumatica',c:'ERP',seg:['SMB','MM'],path:'1P',pos:'Yes',b2b:'Partial',sup:'Acumatica Cloud ERP (App Store — native, Acumatica-published) · Kensium = implementation VAR (also offers its own KCF connector)',
+ note:'Native Acumatica-published app — Acumatica acquired the original Kensium connector, so it\'s no longer "Kensium-built." Supports B2C/B2B/DTC in one store (confirm B2B feature depth). It receives the estimated shipping fee in the order payload (you map zones/methods). Kensium is the go-to implementation VAR — confirm the merchant\'s VAR knows the connector before you commit timelines.', url:'https://apps.shopify.com/acumatica-cloud-erp'},
+{n:'MS Dynamics 365 Business Central',c:'ERP',seg:['SMB','MM'],path:'1P',pos:'Online + POS orders',b2b:'Partial',sup:'Microsoft (free, ships inside BC) — set up via the merchant\'s Microsoft VAR',
+ note:'The SMB Microsoft ERP. Microsoft-built native connector (co-developed with Shopify); syncs <b>online + POS orders</b> into BC, though there\'s no POS UI extension. SaaS BC only (not on-prem). B2B: price sync yes, SKUs stay in Shopify, <b>quotes/draft orders are NOT synced</b>. No native category mapping → watch for tax estimate-vs-recalc gaps.', url:'https://apps.shopify.com/dynamics-365-business-central'},
 {n:'MS Dynamics 365 Finance & Operations (F&O)',c:'ERP',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Custom/agency: VL Omni (eHouse), RSM US, Fisher Technology, Codeless Platforms',
  note:'Enterprise MS ERP with an on-prem component. <b>Not the same as Business Central and NOT covered by its connector.</b> Custom only. Integrator quality varies widely on F&O builds — vet references and prior Shopify projects carefully.'},
-{n:'MS Dynamics GP (Great Plains)',c:'ERP',seg:['SMB','MM'],path:'Custom',pos:'—',b2b:'—',sup:'Custom via a Microsoft Dynamics reseller',
- note:'Legacy. Custom integration through a Dynamics reseller.'},
-{n:'MS Retail Management System (RMS)',c:'ERP',seg:['SMB'],path:'App',pos:'—',b2b:'—',sup:'nChannel, Kosmos eSync, Webgility, SPS Commerce, eBridge',
- note:'Legacy retail system. Connect via a third-party connector, or recommend migrating to Retail Management Hero (RMH).'},
-{n:'SAP Business One (B1)',c:'ERP',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'Vision33 (Saltbox connector), Codeless Platforms (EMEA), or custom (e.g. BlueSwitch)',
+{n:'SAP Business One (B1)',c:'ERP',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'Vision33 (Saltbox connector), Codeless Platforms, or custom (e.g. BlueSwitch)',
  note:'The SMB/MM flavour of SAP. Vision33 specializes in SAP Business One; for other SAP products check coverage directly. Achievable, but plan for middleware or custom work.'},
-{n:'SAP S/4HANA & ECC',c:'ERP',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'GSI/SI (Accenture, Infosys, Deloitte, EPAM); VL Omni; TMG “Fuse”; MuleSoft',
- note:'Enterprise SAP — no connector, GSI territory. Generally beyond a scaled-partner build.'},
+{n:'SAP S/4HANA & ECC',c:'ERP',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'GSI/SI (Accenture, Infosys, Deloitte, EPAM); SAP Integration Suite; TMG “Fuse” (Shopify Partner Solutions)',
+ note:'Enterprise SAP. Productized paths now exist (TMG “Fuse” via Shopify Partner Solutions; SAP\'s own Integration Suite package), but this is ENT / PS scope — loop in Shopify Sales/PS rather than scoping it solo.'},
 {n:'SAP By Design',c:'ERP',seg:['MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'Celigo, Fisher Technology, Codeless Platforms',
  note:'Mid-market SAP cloud ERP; reachable via certified middleware.'},
-{n:'Sage Intacct',c:'ERP',seg:['MM'],path:'Custom',pos:'—',b2b:'—',sup:'Custom / middleware',
+{n:'Sage Intacct',c:'ERP',seg:['MM'],path:'Custom',pos:'—',b2b:'—',sup:'Custom / middleware (Intacct Marketplace: Venn, Besyncly, Stock2Shop)',
  note:'Finance ERP. Good fit when the merchant needs invoicing / AR / charge-account workflows Shopify can\'t do natively.'},
-{n:'Sage 100 / 200 / 300',c:'ERP',seg:['SMB','MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'Jitterbit, Alumio, Zapier (no certified connector)',
+{n:'Sage 100 / 200 / 300',c:'ERP',seg:['SMB','MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'Jitterbit, Alumio, commercebuild (no certified Shopify connector)',
  note:'No certified connector. Common snag: the merchant\'s Sage reseller isn\'t familiar with whatever connector gets pitched — confirm up front.'},
-{n:'Sage 50 / Business Cloud Accounting',c:'Accounting',seg:['SMB'],path:'App',pos:'—',b2b:'—',sup:'Sage Business Cloud app (weak reviews), Zapier, Alumio',
- note:'Lightweight Sage. App Store options are limited — test before recommending.'},
+{n:'Sage Business Cloud Accounting',c:'Accounting',seg:['SMB'],path:'App',pos:'—',b2b:'—',sup:'Combidesk (App Store — not Sage-published; weak reviews) · Zapier / Alumio',
+ note:'Covers <b>Sage Business Cloud Accounting (cloud)</b> — NOT Sage 50 desktop (a different product; needs a third-party connector). App Store options are limited — test before recommending.', url:'https://apps.shopify.com/sage-business-cloud-accounting'},
 {n:'Brightpearl (by Sage)',c:'ERP',seg:['SMB','MM'],path:'1P',pos:'Own POS',b2b:'Partial',sup:'Brightpearl (native integration)',
- note:'Retail ERP + IMS. Bidirectional fulfillments supported; some limits (e.g. large warehouse-mapping setups). Brightpearl was acquired by Sage in 2022 — confirm roadmap and support cadence with the vendor when scoping longer-term builds.'},
-{n:'Infor (M3 / CloudSuite)',c:'ERP',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Custom/agency',
- note:'Custom integration territory.'},
+ note:'Retail ERP + IMS. Bidirectional fulfillments supported; some limits (e.g. large warehouse-mapping setups). Brightpearl was acquired by Sage in 2022 — confirm roadmap and support cadence with the vendor when scoping longer-term builds.', url:'https://apps.shopify.com/brightpearl'},
+{n:'Infor (M3 / CloudSuite)',c:'ERP',seg:['MM','ENT'],path:'App',pos:'—',b2b:'—',sup:'Infor eCommerce Connector (App Store — Infor-published, Shopify Global ERP program)',
+ note:'Certified Infor-published connector (M3 CE). Real limits — single company/entity/currency, payment reconciliation external; heavily-customized M3 still leans custom.', url:'https://apps.shopify.com/infor-ecommerce-connector'},
 {n:'Oracle EBS / Fusion',c:'ERP',seg:['ENT'],path:'iPaaS',pos:'—',b2b:'—',sup:'Oracle Integration Cloud Shopify adapter (Fusion) · or custom',
  note:'Enterprise. No PrivateLink / IP allowlisting; EBS often on-prem. Beyond a scaled build.'},
-{n:'Oracle JD Edwards (JDE)',c:'ERP',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Custom/agency (e.g. Dyode, VL Omni)',
+{n:'Oracle JD Edwards (JDE)',c:'ERP',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Custom/agency (Alumio, Oracle Integration Cloud, or a JDE-experienced integrator)',
  note:'Custom; each build differs by the JDE backend setup.'},
-{n:'Epicor',c:'ERP',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'Yes',sup:'Custom/agency (e.g. Teifi)',
- note:'Custom build; varies by the Epicor backend. Use native B2B catalogs for contract pricing — anything beyond that is a Sales/PS conversation, not a scaled build.'},
+{n:'Epicor',c:'ERP',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'Yes',sup:'Custom/agency',
+ note:'Custom. Live ERP pricing has been done via Cart Transform Functions (B2B) — powerful, but a custom build.'},
 {n:'IFS',c:'ERP',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'—',sup:'Boomi (common), Alumio',
  note:'Reachable via middleware.'},
-{n:'Odoo',c:'ERP',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'Odoo-native connector (preferred), Jitterbit, Webkul',
+{n:'Odoo',c:'ERP',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'Odoo-native connector (preferred; configured in Odoo), or third-party (Webkul, Jitterbit)',
  note:'Use an <b>Odoo-native</b> connector so the support path stays Shopify ↔ Odoo and you\'re not stuck between three vendors.'},
-{n:'Zoho (Inventory / Books)',c:'ERP',seg:['SMB'],path:'iPaaS',pos:'—',b2b:'—',sup:'Mesa (ShopPad), Zapier',
- note:'SMB suite; connect via automation/middleware.'},
+{n:'Zoho (Inventory / Books)',c:'ERP',seg:['SMB'],path:'iPaaS',pos:'—',b2b:'—',sup:'Zoho-native built-in connector, or Mesa (ShopPad) / Zapier',
+ note:'SMB suite; connect via Zoho\'s built-in Shopify integration or automation/middleware.'},
 {n:'Fulfil.io',c:'ERP',seg:['MM'],path:'App',pos:'—',b2b:'—',sup:'Fulfil (Shopify-native ERP/OMS)',
- note:'Modular multi-channel ERP/OMS with strong Shopify integration; popular with mid-market.'},
+ note:'Modular multi-channel ERP/OMS with strong Shopify integration; popular with mid-market.', url:'https://apps.shopify.com/fulfil-retail-erp'},
+{n:'GoodDay',c:'ERP',seg:['SMB','MM'],path:'App',pos:'—',b2b:'Partial',sup:'GoodDay (Shopify-first ERP)',
+ note:'A <b>Shopify-first ERP</b> (from ex-Chubbies founder Kyle Hency) — inventory, wholesale, purchase orders/receiving, and accounting/3-way match. An alternative to a traditional ERP, in the same vein as Fulfil.io. <b>Not</b> a raw-materials maker app.'},
 
 /* ===== IMS / Inventory ===== */
-{n:'Cin7 (Core / DEAR)',c:'IMS',seg:['SMB','MM'],path:'App',pos:'Via admin',b2b:'Partial',sup:'Cin7 (App Store: “Cin7 Core” / “DEAR”)',
- note:'The most-recommended SMB/MM inventory system. Strong across IMS + light WMS, units of measure, expiry/lots, light manufacturing. Go-to for apparel size/colour matrices, food/expiry, and sell-by-weight.'},
-{n:'Thrive (Shopventory)',c:'IMS',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'Thrive by Shopventory (App Store)',
- note:'Multi-location inventory + reporting. Known gap: a single PO spanning multiple locations (PO consolidation) often needs their pro-services.'},
+{n:'Cin7 Core',c:'IMS',seg:['SMB','MM'],path:'App',pos:'Via admin',b2b:'Partial',sup:'Cin7 Core (App Store; “Cin7 Omni” is a separate product)',
+ note:'The most-recommended SMB/MM inventory system. Strong across IMS + light WMS, units of measure, expiry/lots, light manufacturing. Go-to for apparel size/colour matrices, food/expiry, and sell-by-weight.', url:'https://apps.shopify.com/dear-inventory'},
+{n:'Thrive Inventory (Shopventory)',c:'IMS',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'Thrive Inventory Management by Shopventory (App Store)',
+ note:'Multi-location inventory + <b>advanced reporting/analytics</b>. As native Shopify covers the inventory basics, position Thrive on the reporting/analytics depth it adds. Known gap: a single PO spanning multiple locations (PO consolidation) often needs their pro-services.', url:'https://apps.shopify.com/shopventory'},
 {n:'Inventory Planner (by Sage)',c:'IMS',seg:['SMB','MM'],path:'App',pos:'No POS UI',b2b:'—',sup:'Inventory Planner by Sage (App Store)',
- note:'Forecasting & replenishment. Browser-only — no POS UI extension.'},
-{n:'Fishbowl',c:'IMS',seg:['SMB','MM'],path:'App',pos:'Via admin',b2b:'Partial',sup:'Fishbowl (native integration)',
- note:'More capable than Shopify\'s native inventory tooling — EDI, serial/lot tracking. <b>Caveat:</b> once an order imports it doesn\'t continuously re-sync (pay-later/late edits break), and there\'s no live PO scanning into Shopify POS.'},
+ note:'Forecasting & replenishment — and forecasting is <b>explicitly out of scope</b> for Shopify\'s native inventory, so this stays relevant as native absorbs the basics. Browser-only — no POS UI extension.', url:'https://apps.shopify.com/inventory-planner'},
+{n:'Fishbowl',c:'IMS',seg:['SMB','MM'],path:'App',pos:'Via admin',b2b:'Partial',sup:'Fishbowl Drive (App Store — Fishbowl-published)',
+ note:'More capable than Shopify\'s native inventory tooling — EDI, serial/lot tracking. <b>Caveat:</b> once an order imports it doesn\'t continuously re-sync (pay-later/late edits break), and there\'s no live PO scanning into Shopify POS.', url:'https://apps.shopify.com/fishbowl-online-1'},
 
 /* ===== Manufacturing ===== */
-{n:'Katana',c:'Manufacturing',seg:['SMB','MM'],path:'App',pos:'Via admin',b2b:'—',sup:'Katana MRP (App Store)',
- note:'The go-to for <b>BOM / raw-materials → finished SKUs</b> (makers: food, cosmetics, furniture). Keeps the manufacturing complexity out of Shopify.'},
-{n:'Materials Inventory / GoodDay',c:'Manufacturing',seg:['SMB'],path:'App',pos:'—',b2b:'—',sup:'App Store (smaller, merchant-hungry vendors)',
- note:'Lighter raw-materials apps for small makers when Katana/Cin7 are overkill or over-budget.'},
+{n:'Katana',c:'Manufacturing',seg:['SMB','MM'],path:'App',pos:'Via admin',b2b:'—',sup:'Katana Cloud Inventory (App Store)',
+ note:'The go-to for <b>BOM / raw-materials → finished SKUs</b> (makers: food, cosmetics, furniture). Keeps the manufacturing complexity out of Shopify.', url:'https://apps.shopify.com/katana-mrp-manufacturing-and-inventory-management'},
+{n:'Materials Inventory',c:'Manufacturing',seg:['SMB'],path:'App',pos:'—',b2b:'—',sup:'Materials Inventory ERP (App Store)',
+ note:'Raw-materials / recipe / BOM app for small makers when Katana or Cin7 are overkill or over-budget.', url:'https://apps.shopify.com/materials-inventory'},
 
 /* ===== WMS / OMS ===== */
-{n:'Pipe17',c:'WMS/OMS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Yes',sup:'Pipe17 (App Store / pipe17.com)',
- note:'OMS + order routing; bridges returns/RMA to ERP/WMS. B2B in scope. Useful when orders aren\'t closing out cleanly across systems.'},
-{n:'Deposco',c:'WMS/OMS',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Deposco (custom/middleware)',
- note:'Robust WMS/OMS for allocation, routing, BOPIS at scale.'},
-{n:'Linnworks / SKUVault',c:'WMS/OMS',seg:['MM'],path:'App',pos:'—',b2b:'—',sup:'Linnworks (App Store / linnworks.com)',
- note:'IMS/WMS with bin & zone management. Can get pricey (base + forecasting add-on).'},
-{n:'SkuLabs',c:'WMS/OMS',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'SkuLabs (App Store)',
- note:'Mid-tier IMS/WMS; good step up when Shopify\'s native inventory tooling is too light.'},
+{n:'Pipe17',c:'WMS/OMS',seg:['MM','ENT'],path:'App',pos:'—',b2b:'Yes',sup:'Pipe17 (App Store)',
+ note:'OMS + order routing (DTC / POS / B2B); bridges returns/RMA to ERP/WMS. Useful when orders aren\'t closing out cleanly across systems.', url:'https://apps.shopify.com/pipe17-app'},
+{n:'Deposco',c:'WMS/OMS',seg:['MM','ENT'],path:'App',pos:'—',b2b:'—',sup:'Deposco Fulfillment (App Store — native, Built for Shopify)',
+ note:'Robust WMS/OMS for allocation, routing, BOPIS at scale; native Shopify connector (no longer custom-only).', url:'https://apps.shopify.com/deposco'},
+{n:'Linnworks / SkuVault',c:'WMS/OMS',seg:['MM'],path:'App',pos:'—',b2b:'—',sup:'Linnworks (App Store) — SkuVault Core is the surviving SkuVault product',
+ note:'IMS/WMS with bin & zone management. Can get pricey (base + forecasting add-on).', url:'https://apps.shopify.com/linnworks'},
+{n:'SkuLabs',c:'WMS/OMS',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'SKULabs (App Store)',
+ note:'Mid-tier IMS/WMS. As native Shopify absorbs stock counts, transfers, multi-location and PO/receiving, reach for SkuLabs for the <b>advanced needs Shopify isn\'t building</b> — multi-warehouse WMS, batch picking/kitting, barcode workflows — not just "more than native."', url:'https://apps.shopify.com/skulabs'},
 {n:'ShipHero',c:'WMS/OMS',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'ShipHero (App Store)',
- note:'Warehouse/fulfillment-focused; common "next step up" from Shopify\'s native inventory tooling.'},
-{n:'Manhattan',c:'WMS/OMS',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'GSI / custom',
- note:'Enterprise WMS/OMS — usually beyond a scaled build.'},
-{n:'NuOrder',c:'WMS/OMS',seg:['MM'],path:'Custom',pos:'—',b2b:'Yes',sup:'NuOrder (their in-house build, ~12–16 wks)',
- note:'B2B wholesale ordering. Native integration is one-way (NuOrder → Shopify); annual-fee model, no quick connector — set timeline expectations.'},
-{n:'Legacy retail (Mi9 / Raymark / Retail Pro / Aptos)',c:'WMS/OMS',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Migrate — don\'t integrate',
- note:'Generally not worth integrating — plan a migration. (Mi9 <i>Merchant</i> merchandising can integrate custom even where Mi9 POS is gone.)'},
+ note:'Warehouse/fulfillment-focused; common "next step up" from Shopify\'s native inventory tooling.', url:'https://apps.shopify.com/shiphero'},
+{n:'Manhattan',c:'WMS/OMS',seg:['ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Manhattan Associates (native App Store connector; ENT) — engage Shopify Sales/PS',
+ note:'Enterprise WMS/OMS. A native Manhattan connector now exists (real-time inventory, order/fulfillment status, payments), but this is ENT scope — loop in Shopify Sales/PS rather than scoping it solo.'},
+{n:'NuORDER by Lightspeed',c:'WMS/OMS',seg:['MM'],path:'Custom',pos:'—',b2b:'Yes',sup:'NuORDER (Lightspeed-owned) — custom / API integration',
+ note:'B2B wholesale ordering (Lightspeed acquired NuORDER in 2021). API-based custom integration — verify sync directionality and timeline/fees with the vendor; no quick plug-and-play connector.'},
+{n:'Legacy / discontinued (Mi9, Raymark, Retail Pro, Aptos, MS RMS, Dynamics GP)',c:'WMS/OMS',seg:['MM','ENT'],path:'Custom',pos:'—',b2b:'—',sup:'Migrate — don\'t integrate',
+ note:'Generally not worth integrating — plan a migration. Includes <b>MS Retail Management System</b> (Microsoft-discontinued) and <b>MS Dynamics GP</b> (Microsoft EOL track, no new customers) — both real but vanishingly rare for SMB/MM, so no standalone card. (Mi9 <i>Merchant</i> merchandising can integrate custom even where Mi9 POS is gone.)'},
 
 /* ===== Accounting ===== */
-{n:'QuickBooks Online (QBO)',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'App Store: QuickBooks Online connector, A2X, Bookkeep, MyWorks, Webgility',
- note:'The default SMB accounting target. Pick by need: sales summaries (A2X / Bookkeep) vs full data sync (Webgility / MyWorks).'},
-{n:'QuickBooks Desktop (QBD)',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'App Store: Webgility (two-way), Parex, Connex, T-Hub',
+{n:'QuickBooks Online (QBO)',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'App Store: QuickBooks Online (by Intuit), A2X, Bookkeep, MyWorks, Webgility',
+ note:'The default SMB accounting target. The native connector is Intuit-published (not Shopify). Pick by need: sales summaries (A2X / Bookkeep) vs full data sync (Webgility / MyWorks).', url:'https://apps.shopify.com/qbconnector'},
+{n:'QuickBooks Desktop (QBD)',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'App Store: Webgility (two-way), Parex, Connex Ecommerce, MyWorks · T-HUB Desktop is a separate download (the App Store T-HUB is QuickBooks Online only)',
  note:'A recurring headache. <b>Webgility</b> is the most-recommended two-way option. Always confirm the exact QBD version (Enterprise 24.0, etc.) before committing.'},
-{n:'Xero',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'App Store: A2X, Bookkeep, Webgility',
+{n:'Xero',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'App Store: A2X, Bookkeep, Webgility (no Xero-published native connector)',
  note:'SMB accounting; summary-sync connectors are the norm.'},
-{n:'BookKeep',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'BookKeep (App Store)',
- note:'Automates daily summaries and can <b>split payouts across bank accounts / escrow tax</b> — the usual answer to "multiple bank accounts in one shop." Often too pricey for the smallest merchants.'},
+{n:'Bookkeep',c:'Accounting',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'Bookkeep (App Store)',
+ note:'Automates daily summaries and can <b>split payouts across bank accounts / escrow tax</b> — the usual answer to "multiple bank accounts in one shop." Often too pricey for the smallest merchants.', url:'https://apps.shopify.com/bookkeep-com-daily-summary-e-commerce'},
 
 /* ===== Middleware ===== */
-{n:'Celigo',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'Celigo (App Store / celigo.com)',
+{n:'Celigo',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'Celigo (celigo.com / SuiteApp — no browsable App Store app)',
  note:'Widely used for NetSuite ("NetSuite Integration by Celigo"). If capture happens in NetSuite, those payouts won\'t hit Shopify finance reports. B2B-primitive support varies — verify for the build.'},
 {n:'Jitterbit',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Yes',sup:'Jitterbit (jitterbit.com — incl. self-serve via Jitterbit University)',
- note:'Documented B2B-primitive support (companies, catalogs, price lists). Has on-prem/SQL connectors (stored procedures). Supports self-serve through full implementation.'},
+ note:'Documented B2B-primitive support (companies, catalogs, price lists). Has on-prem/SQL connectors (stored procedures). Its older App Store app (the former eBridge listing) is delisted — go vendor-direct.'},
 {n:'VL Omni (eHouse)',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'VL Omni (part of eHouse Studio)',
- note:'Strong for SAP, JDE, AS400, and D365 F&O connectors.'},
+ note:'Strong for SAP, AS400, and D365 F&O connectors (confirm JDE coverage directly with the vendor).'},
 {n:'Patchworks',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'Partial',sup:'Patchworks (patchworks.com)',
- note:'Used for NetSuite and other ERP connections, especially in EMEA.'},
-{n:'Boomi (Dell)',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'—',sup:'Boomi (not a certified Shopify partner)',
- note:'Capable, but not in Shopify\'s certified program. Frequently used for IFS and D365 F&O integrations.'},
-{n:'MuleSoft (Salesforce)',c:'iPaaS',seg:['ENT'],path:'iPaaS',pos:'—',b2b:'—',sup:'MuleSoft (Salesforce; not certified)',
- note:'Enterprise middleware. Verify current B2B-primitive coverage before committing. Usually enterprise-scope.'},
+ note:'Used for NetSuite and other ERP connections, especially in EMEA. Publicly the <b>only Shopify-certified iPaaS</b> — the one certified-middleware option here (Boomi isn\'t certified).', url:'https://apps.shopify.com/patchworks'},
+{n:'Boomi',c:'iPaaS',seg:['MM','ENT'],path:'iPaaS',pos:'—',b2b:'—',sup:'Boomi (independent; not a certified Shopify partner)',
+ note:'Capable, but not in Shopify\'s certified program. Frequently used for IFS and D365 F&O integrations. (Divested by Dell in 2021 — now independent.)'},
 {n:'Alumio',c:'iPaaS',seg:['MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'Alumio (alumio.com)',
  note:'Lower-cost middleware; seen for Sage and IFS.'},
 {n:'Mesa (ShopPad)',c:'iPaaS',seg:['SMB'],path:'iPaaS',pos:'—',b2b:'—',sup:'Mesa by ShopPad (App Store)',
- note:'SMB automation/middleware; used for Odoo and Zoho.'},
+ note:'SMB automation/middleware; used for Odoo and Zoho.', url:'https://apps.shopify.com/mesa'},
 {n:'Matrixify',c:'iPaaS',seg:['SMB','MM','ENT'],path:'App',pos:'—',b2b:'—',sup:'Matrixify (App Store)',
- note:'Gold standard for <b>flat files</b> — scheduled CSV import/export, SFTP, field mapping. Great for ERPs with no API and for initial data loads. <b>Not</b> real-time two-way sync.'},
+ note:'Gold standard for <b>flat files</b> — scheduled CSV import/export, SFTP, field mapping. Great for ERPs with no API and for initial data loads. <b>Not</b> real-time two-way sync.', url:'https://apps.shopify.com/excel-export-import'},
 {n:'Syncio',c:'iPaaS',seg:['SMB','MM'],path:'App',pos:'—',b2b:'—',sup:'Syncio (App Store)',
- note:'Multi-store inventory/product/order sync — the usual companion when a merchant runs multiple Shopify stores / expansion stores.'},
+ note:'Multi-store inventory/product/order sync — the usual companion when a merchant runs multiple Shopify stores / expansion stores.', url:'https://apps.shopify.com/syncio'},
 {n:'Webgility',c:'iPaaS',seg:['SMB'],path:'App',pos:'Via admin',b2b:'—',sup:'Webgility (App Store)',
- note:'Accounting-focused connector; two-way QBO/QBD/Xero sync. The most-recommended QuickBooks bridge.'},
-{n:'SPS Commerce / eBridge / nChannel',c:'iPaaS',seg:['SMB','MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'EDI vendors (SPS Commerce, eBridge, nChannel)',
- note:'EDI and legacy-system integration (e.g. MS RMS, retail/wholesale EDI flows).'}
+ note:'Accounting-focused connector; two-way QBO/QBD/Xero sync. The most-recommended QuickBooks bridge.', url:'https://apps.shopify.com/ecc-quickbooks-integration-for-shopify'},
+{n:'SPS Commerce / EDI',c:'iPaaS',seg:['SMB','MM'],path:'iPaaS',pos:'—',b2b:'—',sup:'SPS Commerce (EDI; current) · eBridge is now part of Jitterbit · nChannel is small — verify it\'s still operating',
+ note:'EDI and legacy-system integration (retail/wholesale EDI flows). SPS Commerce is the healthy go-to here.'}
 ];
 
 const GOTCHAS=[
  {t:'Reconcile payments on Shopify\'s payment_id', d:'With Shopify Payments, point the ERP/accounting integration at Shopify\'s <b>payment_id</b> for payments reconciliation (read it from OrderTransaction.paymentId). Don\'t build reconciliation around a gateway-specific transaction ID.'},
  {t:'Three order IDs — use order.id', d:'order.name (admin) ≠ confirmation number (buyer) ≠ order.id (API). Use <b>order.id</b> as the cross-system match key. The order name isn\'t on the Thank-You page or in Web Pixels, so don\'t build reconciliation around it.'},
+ {t:'SKUs aren\'t unique keys', d:'Shopify doesn\'t enforce SKU uniqueness — multiple variants can share one. Match and sync records on <b>product / variant IDs</b> (and the inventory item ID), not on SKU.'},
  {t:'Build webhooks to be resilient', d:'Connectors that don\'t dedupe / re-query on webhook receipt can cause <b>duplicate or missing orders</b> during peak sales — a common failure mode during BFCM. Add idempotency keys, re-query on receipt, and load-test before high-volume events.'},
- {t:'500 line-item cap', d:'Cart / checkout / order / draft are capped at <b>500 lines</b>. Breaks large B2B/distributor orders. No near-term lift — split orders or qualify the merchant out.'},
- {t:'B2B catalog scaling', d:'B2B catalogs are reliable into the low tens of thousands; very large counts (one catalog per company from the ERP) hit limits. At that scale, rethink the catalog model or qualify the merchant out — one catalog per company from the ERP is beyond a scaled build.'},
- {t:'POS isn\'t a direct ERP target', d:'No direct ERP↔POS link without a POS UI extension. The <b>Purchase Order API isn\'t generally available yet</b> (only Transfers API), so receiving purchase orders from the ERP inside Shopify POS isn\'t native. Verify current PO API status before scoping.'},
+ {t:'500 line-item cap (draft orders: 499)', d:'Cart / checkout / order are capped at <b>500 line items</b>; <b>draft orders cap at 499</b>. Breaks large B2B/distributor orders. No near-term lift — split orders or qualify the merchant out.'},
+ {t:'B2B catalog scaling', d:'B2B catalogs are reliable into the low tens of thousands; very large counts (one catalog per company from the ERP) hit limits. Going beyond that — or highly dynamic contract pricing — is a <b>deeper architecture conversation</b>: real-time ERP pricing at checkout can over-burden checkout and is gated to <b>Enterprise</b>. Don\'t default to it.'},
+ {t:'POS isn\'t a direct ERP target', d:'No direct ERP↔POS link without a POS UI extension. Purchase orders and receiving are <b>native in admin and POS</b>; what\'s still limited is a <b>programmatic PO API</b> to push ERP-generated POs in automatically, so ERP-driven PO receiving inside POS isn\'t turnkey yet. <b>Suppliers are now a native object</b>, and the Transfers API\'s <b>originLocationId</b> accepts a <b>Supplier</b> GID — so a transfer can carry a native supplier as its origin for PO-like inbound flows. But programmatic supplier create/management and a dedicated PO API still aren\'t publicly exposed. Verify current API coverage before scoping that.'},
  {t:'POS UI Extensions are the partner build path for POS↔ERP', d:'When the merchant needs ERP-aware workflows inside POS (live inventory lookup, custom receipt logic, ERP-driven returns), <b>POS UI Extensions</b> are the partner-buildable surface. Off-the-shelf connectors won\'t cover this. Scope it as a custom build alongside the back-office connector, and confirm the extension targets you need are supported.'},
  {t:'Use Plus Staging Stores for integration testing', d:'For Plus merchants, <b>Plus Staging Stores</b> give you a separate environment with a one-time data copy at creation — use these to test ERP/IMS integrations before going live. Staging stores must be created from the merchant\'s Plus org. Ongoing data sync between staging and production isn\'t native; third-party tools (e.g. Rewind Copy) cover that.'},
  {t:'Orders must close out in Shopify', d:'If the ERP settles payment, the order still needs to be marked paid / closed out in Shopify — leaving orders as unpaid drafts breaks the buyer\'s order history and falls outside Shopify\'s terms.'},
  {t:'No live ERP calls at checkout', d:'Real-time pricing/inventory/tax/validation calls to the ERP during checkout require Network Access for Functions — a gated, approval-based entitlement oriented to Enterprise (lower-GMV merchants are typically declined). Confirm eligibility before promising it; otherwise pre-sync ERP data into Shopify metafields/metaobjects ahead of time.'},
- {t:'One shop = one payout account', d:'A single Shopify shop pays out to one bank account by default. Shopify Payments multi-entity can split payouts per legal entity — confirm current plan/eligibility for the merchant\'s case before relying on it. Cross-country splits still typically use expansion stores; tax escrow / accounting splits can also happen downstream (BookKeep / accounting / ERP).'},
+ {t:'One shop = one payout account', d:'A single Shopify shop pays out to one bank account by default. Shopify Payments <b>multi-entity</b> can split payouts per legal entity — and now covers <b>cross-country entities within a single store</b>, so this no longer forces expansion stores; confirm current plan/eligibility for the merchant\'s case before relying on it. Tax escrow / accounting splits can also happen downstream (BookKeep / accounting / ERP).'},
  {t:'A connector isn\'t automatically B2B-aware', d:'Many connectors don\'t support B2B primitives (companies, catalogs, price lists). Confirm B2B coverage for the specific connector before you promise B2B — don\'t assume.'}
 ];
 
@@ -336,7 +335,7 @@ function render(){
         <span class="badge">B2B <b>${d.b2b}</b></span>
       </div>
       <p class="note">${d.note}</p>
-      <div class="pathline"><span class="pv">${PATHLABEL[d.path]}</span> &nbsp;·&nbsp; <span class="support">${d.sup}</span></div>
+      <div class="pathline"><span class="pv">${PATHLABEL[d.path]}</span> &nbsp;·&nbsp; <span class="support">${d.sup}</span>${d.url?` &nbsp;·&nbsp; <a class="aslink" href="${d.url}" target="_blank" rel="noopener">App Store ↗</a>`:''}</div>
     </div>`;}).join('');
 }
 function syncHash(){
